@@ -2,17 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Sprint;
+use App\Models\Notification;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class SprintSeeder extends Seeder
+class NotificationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Sprint::factory(2)->create();
+        Notification::factory(5)->create();
     }
 }

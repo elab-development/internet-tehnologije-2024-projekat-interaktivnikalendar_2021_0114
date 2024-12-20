@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('role');
             $table->rememberToken();
             $table->timestamps();
+            $table->foreignId('sprint_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
