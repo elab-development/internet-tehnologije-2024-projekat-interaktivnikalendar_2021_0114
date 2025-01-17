@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Role;
+
 return [
 
     /*
@@ -40,6 +42,19 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'scrum-master' => [
+            'driver' => 'scrum-master',
+            'provider' => 'users',
+        ],
+        'product-owner' => [
+            'driver' => 'product-owner',
+            'provider' => 'users',
+        ],
+        'developer' => [
+            'driver' => 'developer',
+            'provider' => 'users',
+        ],
     ],
 
     /*
@@ -64,11 +79,6 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

@@ -13,12 +13,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        //we first need to create roles for user factory to assign those roles to users
+        $this->call([
+            RoleSeeder::class,
+        ]);
+
         User::factory(7)->create();
 
         $this->call([
             SprintSeeder::class,
             TaskSeeder::class,
-            NotificationSeeder::class
+            NotificationSeeder::class,
         ]);
     }
 }
