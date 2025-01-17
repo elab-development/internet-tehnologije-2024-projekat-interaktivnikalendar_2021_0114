@@ -4,9 +4,10 @@ namespace App\Providers;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Auth\Guard;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,34 +24,34 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Auth::extend('scrum-master', function ($app, $name, array $config): Guard {
-            return new \Illuminate\Auth\RequestGuard(
-                function ($request) {
-                    return User::where('roles_id', Role::SCRUM_MASTER)->first();
-                },
-                $app['request'],
-                Auth::createUserProvider($config['provider'])
-            );
+        //Here we define custom guards for all roles
+        Auth::viaRequest('scrum-master', function ($request) {
+            return $this->authenticateUser($request, Role::SCRUM_MASTER);
         });
 
-        Auth::extend('product-owner', function ($app, $name, array $config): Guard {
-            return new \Illuminate\Auth\RequestGuard(
-                function ($request) {
-                    return User::where('roles_id', Role::PRODUCT_OWNER)->first();
-                },
-                $app['request'],
-                Auth::createUserProvider($config['provider'])
-            );
+        Auth::viaRequest('product-owner', function ($request) {
+            return $this->authenticateUser($request, Role::PRODUCT_OWNER);
         });
 
-        Auth::extend('developer', function ($app, $name, array $config): Guard {
-            return new \Illuminate\Auth\RequestGuard(
-                function ($request) {
-                    return User::where('roles_id', Role::DEVELOPER)->first();
-                },
-                $app['request'],
-                Auth::createUserProvider($config['provider'])
-            );
+        Auth::viaRequest('developer', function ($request) {
+            return $this->authenticateUser($request, Role::DEVELOPER);
         });
+    }
+
+    //Logic that guards use for checking if user has the right role
+    private function authenticateUser($request, string $roleName): ?User
+    {
+        //Log::info("Authenticating user for {$roleName} guard");
+        $user = $request->user();
+
+        if ($user) {
+            //Log::info('Authenticated user: ' . $user->id);
+            if ($user->role->name === $roleName) {
+                return $user;
+            }
+        }
+
+        //Log::info('Authentication failed');
+        return null;
     }
 }

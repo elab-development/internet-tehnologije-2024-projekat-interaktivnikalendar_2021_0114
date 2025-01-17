@@ -14,19 +14,19 @@ Route::get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
-
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
     Route::group(['middleware' => ['auth:developer']], function () {
         Route::resource('tasks', TaskController::class);
     });
 
     Route::group(['middleware' => ['auth:scrum-master']], function () {
+        Route::get('sprints', [SprintController::class, 'index'])->name('sprints.index');
         Route::post('sprints', [SprintController::class, 'store'])->name('sprints.store');
         Route::delete('sprints/{id}', [SprintController::class, 'destroy']);
     });
 
-    Route::group(['middleware' => ['auth:scrum-master', 'auth:product-owner']], function () {
-        Route::get('sprints', [SprintController::class, 'index'])->name('sprints.index');
+    Route::group(['middleware' => ['auth:scrum-master,product-owner']], function () {
         Route::get('sprints/{id}', [SprintController::class, 'show'])->name('sprints.show');
     });
 
