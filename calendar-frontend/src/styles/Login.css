@@ -1,0 +1,73 @@
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: rgb(255, 235, 0);
+    background: radial-gradient(circle, rgba(255, 235, 0, 1) 0%, rgba(255, 250, 204, 1) 53%);
+    position: relative;
+}
+
+.back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 2.8rem;
+}
+
+.login-card {
+    background-color: var(--black);
+    width: 28vw;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1.2rem;
+}
+
+.login-card h2,
+.login-card p {
+    color: var(--grey);
+}
+
+.login-card form {
+    display: flex;
+    height: 50%;
+    width: 68%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem;
+}
+
+.login-card form input {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.login-card form input:focus {
+    outline-color: var(--rich-yellow);
+}
+
+.login-card form button {
+    background-color: var(--rich-yellow);
+    color: var(--black);
+    border: none;
+    border-radius: 0.8rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+.login-card p>a {
+    color: var(--rich-yellow);
+}
