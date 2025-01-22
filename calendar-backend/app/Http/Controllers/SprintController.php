@@ -61,11 +61,33 @@ class SprintController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Sprint $sprint)
+    public function update(Request $request, $sprint_id)
     {
-        $sprint->update($request->all());
-        return response()->json($sprint);
+     
+        $sprint = Sprint::find($sprint_id);
+        if (is_null($sprint)) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+    
+      
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
+        ]);
+    
+      
+        $sprint->update([
+            'name' => $validatedData['name'],
+            'start' => $validatedData['start'],
+            'end' => $validatedData['end'],
+        ]);
+    
+     
+        return response()->json(['message' => 'Sprint updated successfully.', 'sprint' => $sprint], 200);
     }
+    
+   
 
     /**
      * Remove the specified resource from storage.
