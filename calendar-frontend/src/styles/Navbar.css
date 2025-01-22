@@ -1,0 +1,43 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem auto;
+    background-color: var(--black);
+    border-radius: 2rem;
+    padding: 0.8rem 2rem;
+    width: 90vw;
+    position: relative;
+}
+
+.navbar-logo h3 {
+    color: var(--grey);
+}
+
+.navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.navbar a {
+    color: var(--grey);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.8rem;
+}
+
+.navbar a.active {
+    color: var(--rich-yellow);
+}
+
+#register {
+    background-color: var(--rich-yellow);
+    color: var(--black);
+    border-radius: 2rem;
+    padding: 0.5rem;
+    font-weight: 600;
+}
