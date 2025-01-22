@@ -11,8 +11,12 @@ const Login = () => {
       <div className="login-card">
         <h2>Log in</h2>
         <form>
-          <input type="text" placeholder="Username" />
+          <p>Enter your email and password.</p>
+          <input type="text" placeholder="Email" />
           <input type="password" placeholder="Password" />
+          <a className="forgot-password" href="">
+            Forgot password
+          </a>
           <button type="submit">Log in</button>
         </form>
         <p>

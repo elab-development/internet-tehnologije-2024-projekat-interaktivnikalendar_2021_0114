@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "../styles/Navbar.css";
 
 const Navbar = () => {
@@ -9,9 +9,9 @@ const Navbar = () => {
       </div>
       <nav className="navbar-center">
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/about">About</NavLink>
+        <NavLink to="/features">Features</NavLink>
+        <NavLink to="/pricing">Pricing</NavLink>
         <NavLink to="/contact">Contact</NavLink>
-        <NavLink to="/faq">FAQ</NavLink>
       </nav>
       <div className="navbar-login">
         <NavLink to="/login">Log in</NavLink>
