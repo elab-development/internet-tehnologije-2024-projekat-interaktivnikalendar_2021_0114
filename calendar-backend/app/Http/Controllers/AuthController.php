@@ -73,6 +73,4 @@ class AuthController extends Controller
             'message' => 'No user authenticated'
         ], 401);
     }
-
-   
 }

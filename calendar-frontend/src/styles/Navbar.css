@@ -7,7 +7,12 @@
     border-radius: 2rem;
     padding: 0.8rem 2rem;
     width: 90vw;
-    position: relative;
+    /* position: relative; */
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
 }
 
 .navbar-logo h3 {
@@ -28,6 +33,10 @@
     text-decoration: none;
     font-weight: 600;
     padding: 0.8rem;
+}
+
+.navbar a:hover {
+    color: var(--rich-yellow);
 }
 
 .navbar a.active {
