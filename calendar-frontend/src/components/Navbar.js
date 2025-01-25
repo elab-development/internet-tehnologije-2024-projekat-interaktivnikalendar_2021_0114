@@ -1,4 +1,30 @@
-import { NavLink } from "react-router-dom";
+ import "../styles/Navbar.css";
+  const Navbar = () => {
+  return (
+    
+      <div className="navbar">
+        <div className="navbar-logo">
+          <h3>Scrum</h3>
+        </div>
+        <nav className="navbar-center">
+         
+          <a href="#home">Home</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div className="navbar-login">
+          <a href="/login">Log in</a>
+          <a href="/register" id="register">Register</a>
+        </div>
+      </div>
+  );
+
+  };
+export default Navbar;
+
+
+/*import { NavLink } from "react-router-dom";
 import "../styles/Navbar.css";
 
 const Navbar = () => {
@@ -47,4 +73,6 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Navbar;;*/
+  
+ 

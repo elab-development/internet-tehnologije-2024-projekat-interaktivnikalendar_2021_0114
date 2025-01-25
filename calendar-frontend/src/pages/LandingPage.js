@@ -1,45 +1,23 @@
+import React from "react";
 import Navbar from "../components/Navbar";
 import PricingPage from "./PricingPage";
 import Contacts from "./Contacts";
 import Features from "./Features";
+import "../styles/LandingPage.css";
+
 
 const LandingPage = () => {
   return (
     <div>
       <Navbar />
-      <section id="home">
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-      </section>
-      <section id="features">
+      
+      <section id="features" className="section">
         <Features />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
       </section>
-      <section id="pricing">
+      <section id="pricing" className="section">
         <PricingPage />
       </section>
-      <section id="contact">
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
+      <section id="contact" className="section">
         <Contacts />
       </section>
     </div>
