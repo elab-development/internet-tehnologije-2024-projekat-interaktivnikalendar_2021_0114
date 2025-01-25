@@ -1,0 +1,117 @@
+.register-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: rgb(255, 235, 0);
+    background: radial-gradient(circle, rgba(255, 235, 0, 1) 0%, rgba(255, 250, 204, 1) 53%);
+    position: relative;
+}
+
+.back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 2.8rem;
+}
+
+.register-card {
+    background-color: var(--black);
+    width: 34vw;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 1.2rem;
+}
+
+/* Header */
+.register-header {
+    background-color: var(--black);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top-left-radius: 1.2rem;
+    border-top-right-radius: 1.2rem;
+}
+
+.register-header h2,
+.register-header p {
+    color: var(--grey);
+}
+
+/* Form content */
+.register-card p,
+.register-card form label {
+    color: var(--grey);
+}
+
+.register-card form label {
+    margin-bottom: 0.2rem;
+}
+
+.register-card form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+    height: 100%;
+    width: 80%;
+    margin: 1rem;
+}
+
+.register-card form input,
+.role-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.8rem;
+    box-sizing: border-box;
+    margin-bottom: 0.8rem;
+    box-shadow: 10px 10px 88px -17px rgba(0, 0, 0, 0.26);
+}
+
+.register-card form input:focus,
+.role-select:focus {
+    outline-color: var(--rich-yellow);
+}
+
+.register-card form button {
+    background-color: var(--rich-yellow);
+    color: var(--black);
+    border: none;
+    border-radius: 0.8rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: center;
+    width: 50%;
+}
+
+.register-card p>a {
+    color: var(--rich-yellow);
+}
+
+/* Error messages */
+.error-message {
+    color: #CC3E28 !important;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.error-input {
+    background-color: #ffe6e6;
+    outline: solid;
+    outline-color: red;
+}
+
+.error-label {
+    color: red !important;
+    margin-bottom: 0;
+}
