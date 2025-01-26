@@ -1,44 +1,15 @@
- import "../styles/Navbar.css";
-  const Navbar = () => {
-  return (
-    
-      <div className="navbar">
-        <div className="navbar-logo">
-          <h3>Scrum</h3>
-        </div>
-        <nav className="navbar-center">
-         
-          <a href="#home">Home</a>
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#contact">Contact</a>
-        </nav>
-        <div className="navbar-login">
-          <a href="/login">Log in</a>
-          <a href="/register" id="register">Register</a>
-        </div>
-      </div>
-  );
-
-  };
-export default Navbar;
-
-
-/*import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "../styles/Navbar.css";
 
 const Navbar = () => {
+  // Add smooth scrolling effect to navigation links and offsets navigation links by 8rem
   const handleScroll = (e, id) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      const offset =
-        8 * parseFloat(getComputedStyle(document.documentElement).fontSize); // 8rem in pixels
-      const elementPosition =
-        element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - offset;
+      const offset = 8 * 16; // 8rem in pixels assuming 1rem = 16px
       window.scrollTo({
-        top: offsetPosition,
+        top: element.offsetTop - offset,
         behavior: "smooth",
       });
     }
@@ -73,6 +44,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;;*/
-  
- 
+export default Navbar;

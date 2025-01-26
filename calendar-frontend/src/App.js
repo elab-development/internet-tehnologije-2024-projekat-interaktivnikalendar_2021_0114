@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
@@ -13,7 +15,16 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-          <Route path="dashboard" element={<h1>Dashboard Page</h1>} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="kanban"
+            element={
+              // Just a placeholder for now
+              <div style={{ display: "flex" }}>
+                <Sidebar /> <h1>Kanban</h1>
+              </div>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

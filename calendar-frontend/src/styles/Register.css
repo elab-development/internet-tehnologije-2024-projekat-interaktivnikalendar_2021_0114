@@ -94,6 +94,7 @@
     width: 50%;
 }
 
+/* Log in link */
 .register-card p>a {
     color: var(--rich-yellow);
 }

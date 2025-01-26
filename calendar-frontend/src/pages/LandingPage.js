@@ -1,17 +1,18 @@
-import React from "react";
 import Navbar from "../components/Navbar";
 import PricingPage from "./PricingPage";
 import Contacts from "./Contacts";
 import Features from "./Features";
-import "../styles/LandingPage.css";
-
 
 const LandingPage = () => {
   return (
     <div>
       <Navbar />
-      
-      <section id="features" className="section">
+      <section id="home" style={{ paddingTop: "15rem" }}></section>
+      <section
+        id="features"
+        className="section"
+        style={{ paddingBottom: "15rem" }}
+      >
         <Features />
       </section>
       <section id="pricing" className="section">

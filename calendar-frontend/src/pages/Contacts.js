@@ -1,15 +1,13 @@
 import "../styles/Contact.css";
 
-
 const Contacts = () => {
   return (
     <div className="contact-page">
       <h1>Find Us</h1>
       <div className="contact-cards-container">
-        
         <div className="contact-card">
           <h3>Email</h3>
-            <p>stefanmasa@gmail.com</p>
+          <p>stefanmasa@gmail.com</p>
         </div>
 
         <div className="contact-card">
@@ -24,7 +22,6 @@ const Contacts = () => {
       </div>
     </div>
   );
-
 };
 
 export default Contacts;
