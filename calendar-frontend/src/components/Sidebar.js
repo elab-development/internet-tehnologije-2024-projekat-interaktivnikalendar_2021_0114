@@ -2,7 +2,7 @@ import "../styles/Sidebar.css";
 import { MdLogout } from "react-icons/md";
 import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
-import { IoSettingsOutline } from "react-icons/io5";
+import { IoSettingsOutline, IoPeople } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -40,8 +40,13 @@ const Sidebar = () => {
             <BsKanban className="sidebar-icon" />
             Kanban
           </NavLink>
-        </div>
 
+          <NavLink to="/team" className="icon-and-link">
+            <IoPeople className="sidebar-icon" />
+            Team
+          </NavLink>
+        </div>
+        <hr />
         <div className="sidebar-section">
           <h3 onClick={toggleTasksCollapse}>
             Tasks
@@ -80,6 +85,7 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-settings">
+        <hr />
         <NavLink to="/settings" className="icon-and-link">
           <IoSettingsOutline className="sidebar-icon" />
           Settings

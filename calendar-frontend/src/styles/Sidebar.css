@@ -6,11 +6,15 @@
     display: grid;
     grid-template-rows: 30% 1fr auto;
     gap: 1rem;
+    border-right: solid 0.5px var(--grey-v2);
 }
 
+/* Temporary style, add the right one later */
 .small-calendar {
     background-color: white;
     margin-top: 1rem;
+    border: solid 0.5px var(--grey-v2);
+    border-radius: 4px;
 }
 
 .sidebar-sections {
@@ -45,7 +49,6 @@
     cursor: pointer;
     background-color: var(--grey-v2);
     color: var(--black);
-    fill: var(--black);
     border-radius: 4px;
 }
 
@@ -82,9 +85,21 @@
 
 #log-out-section:hover {
     background-color: #FBE4E4;
+    border-radius: 4px;
 }
 
 #log-out-icon {
     fill: var(--red);
     padding-right: 0.2rem;
+}
+
+hr {
+    border: 0.5px solid var(--grey-v2);
+    margin: 0.5rem 0;
+}
+
+ul li {
+    list-style-type: square;
+    font-size: 1vw;
+    color: var(--dark-grey);
 }
