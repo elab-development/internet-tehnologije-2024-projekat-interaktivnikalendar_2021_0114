@@ -6,11 +6,13 @@ import { IoSettingsOutline, IoPeople } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  // State to keep track of whether the section is collapsed
   const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   const toggleTasksCollapse = () => {
     setIsTasksCollapsed(!isTasksCollapsed);
@@ -18,6 +20,25 @@ const Sidebar = () => {
 
   const toggleFiltersCollapse = () => {
     setIsFiltersCollapsed(!isFiltersCollapsed);
+  };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        "http://127.0.0.1:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      localStorage.removeItem("token");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -90,7 +111,7 @@ const Sidebar = () => {
           <IoSettingsOutline className="sidebar-icon" />
           Settings
         </NavLink>
-        <p id="log-out-section">
+        <p id="log-out-section" onClick={handleLogout}>
           <MdLogout id="log-out-icon" />
           Log Out
         </p>
