@@ -1,0 +1,29 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        //we first need to create roles for user factory to assign those roles to users
+        $this->call([
+            RoleSeeder::class,
+        ]);
+
+        User::factory(7)->create();
+
+        $this->call([
+            SprintSeeder::class,
+            TaskSeeder::class,
+            NotificationSeeder::class,
+        ]);
+    }
+}

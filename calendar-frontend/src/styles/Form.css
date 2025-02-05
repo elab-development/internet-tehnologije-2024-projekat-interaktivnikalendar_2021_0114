@@ -1,0 +1,64 @@
+/* Pozadinska maska - overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Poluprovidna crna pozadina */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modalni prozor */
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  text-align: center;
+}
+
+/* Stilizacija input polja */
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+/* Stilizacija dugmadi */
+.modal-content button {
+  padding: 12px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.modal-content button[type="submit"] {
+  background: #007bff;
+  color: white;
+}
+
+.modal-content button[type="submit"]:hover {
+  background: #0056b3;
+}
+
+/* Dugme za zatvaranje */
+.close-button {
+  background: red;
+  color: white;
+}
+
+.close-button:hover {
+  background: darkred;
+}
+
