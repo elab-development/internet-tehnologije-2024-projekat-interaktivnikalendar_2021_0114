@@ -34,6 +34,7 @@ function App() {
             }
           />
           <Route path="*" element={<NotFound />} />
+          
         </Routes>
       </div>
     </BrowserRouter>

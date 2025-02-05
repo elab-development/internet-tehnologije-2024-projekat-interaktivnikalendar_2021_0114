@@ -33,7 +33,8 @@ class TaskController extends Controller
         $task = Task::create([
             'name' => $request->name,
             'description' => $request->description,
-            'deadline' => $request->deadline,
+            'start' => $request->start,
+            'end' => $request->end,
             'status' => $request->status,
             'user_id' => $request->user_id,
             'sprint_id' => $request->sprint_id,
@@ -77,7 +78,8 @@ class TaskController extends Controller
         $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
-                'deadline' => 'nullable|date',
+                'start' => 'required|date',
+                'end' => 'required|date|after_or_equal:start',
                 'status' => 'required|string',
                 'user_id' => 'required|exists:users,id', 
                 'sprint_id' => 'required|exists:sprints,id', 
@@ -88,7 +90,8 @@ class TaskController extends Controller
         $task->update([
             'name' => $validatedData['name'],
             'description' => $validatedData['description'] ?? null,
-            'deadline' => $validatedData['deadline'] ?? null,
+            'start' => $validatedData['start'] ?? null,
+            'end' => $validatedData['end'] ?? null,
             'status' => $validatedData['status'],
             'user_id' => $validatedData['user_id'],
             'sprint_id' => $validatedData['sprint_id'],
