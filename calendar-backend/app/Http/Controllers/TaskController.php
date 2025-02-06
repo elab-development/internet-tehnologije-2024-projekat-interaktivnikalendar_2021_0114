@@ -30,15 +30,17 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $task = Task::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'start' => $request->start,
-            'end' => $request->end,
-            'status' => $request->status,
-            'user_id' => $request->user_id,
-            'sprint_id' => $request->sprint_id,
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
+            'status' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'sprint_id' => 'required|exists:sprints,id',
         ]);
+
+        $task = Task::create($validatedData);
 
         return response()->json(['Task created successfully.', $task]);
     }
@@ -52,9 +54,9 @@ class TaskController extends Controller
         if (is_null($task)) {
             return response()->json('Data not found', 404);
         }
-            return response()->json($task);
+        return response()->json($task);
     }
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -73,20 +75,20 @@ class TaskController extends Controller
         if (is_null($task)) {
             return response()->json(['message' => 'Data not found'], 404);
         }
-    
-      
+
+
         $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'start' => 'required|date',
-                'end' => 'required|date|after_or_equal:start',
-                'status' => 'required|string',
-                'user_id' => 'required|exists:users,id', 
-                'sprint_id' => 'required|exists:sprints,id', 
-           
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
+            'status' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'sprint_id' => 'required|exists:sprints,id',
+
         ]);
-    
-      
+
+
         $task->update([
             'name' => $validatedData['name'],
             'description' => $validatedData['description'] ?? null,
@@ -96,8 +98,8 @@ class TaskController extends Controller
             'user_id' => $validatedData['user_id'],
             'sprint_id' => $validatedData['sprint_id'],
         ]);
-    
-     
+
+
         return response()->json(['message' => 'Task updated successfully.', 'task' => $task], 200);
     }
 
@@ -106,7 +108,7 @@ class TaskController extends Controller
      */
     public function destroy($task_id)
     {
-        $task= Task::find($task_id);
+        $task = Task::find($task_id);
         $task->delete();
         return response()->json('Task deleted successfully.');
     }

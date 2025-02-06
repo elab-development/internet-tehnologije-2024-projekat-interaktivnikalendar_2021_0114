@@ -21,7 +21,9 @@ class TaskFactory extends Factory
         return [
             'name' => fake()->sentence(),
             'description' => fake()->paragraph(5),
-            'deadline' => fake()->date(),
+            // 'deadline' => fake()->date(),
+            'start' => fake()->date(),
+            'end' => fake()->date(),
             'status' => fake()->word(),
             'user_id' => User::inRandomOrder()->first() ?? User::factory()->create(),
             'sprint_id' => Sprint::inRandomOrder()->first() ?? Sprint::factory()->create()

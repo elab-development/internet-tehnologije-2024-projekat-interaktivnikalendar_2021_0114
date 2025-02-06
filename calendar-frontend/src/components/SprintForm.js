@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../styles/Form.css";
 
-const SprintForm = ({ onSprintAdded, fetchSprints, fetchTasks, onClose }) => {
+const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     start: "",
@@ -31,9 +31,8 @@ const SprintForm = ({ onSprintAdded, fetchSprints, fetchTasks, onClose }) => {
       .then((response) => {
         onSprintAdded(response.data.sprint);
         fetchSprints();
-        fetchTasks();
         setFormData({ name: "", start: "", end: "" });
-        onClose(); 
+        onClose();
       })
       .catch(() => alert("Failed to add sprint"));
   };
@@ -74,7 +73,9 @@ const SprintForm = ({ onSprintAdded, fetchSprints, fetchTasks, onClose }) => {
             />
           </div>
           <button type="submit">Add Sprint</button>
-          <button type="button" className="close-button" onClick={onClose}>Cancel</button>
+          <button type="button" className="close-button" onClick={onClose}>
+            Cancel
+          </button>
         </form>
       </div>
     </div>

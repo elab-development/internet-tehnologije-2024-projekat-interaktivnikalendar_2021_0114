@@ -29,11 +29,18 @@ class SprintController extends Controller
      */
     public function store(Request $request)
     {
-        $sprint = Sprint::create([
-            'name' => $request->name,
-            'start' => $request->start,
-            'end' => $request->end
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
         ]);
+
+        $sprint = Sprint::create($validatedData);
+
+        // Assign the sprint to the logged-in user
+        $user = $request->user();
+        $user->sprint_id = $sprint->id;
+        $user->save();
 
         return response()->json(['Sprint created successfully.', $sprint]);
     }
@@ -63,31 +70,29 @@ class SprintController extends Controller
      */
     public function update(Request $request, $sprint_id)
     {
-     
+
         $sprint = Sprint::find($sprint_id);
         if (is_null($sprint)) {
             return response()->json(['message' => 'Data not found'], 404);
         }
-    
-      
+
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'required|date|after_or_equal:start',
         ]);
-    
-      
+
+
         $sprint->update([
             'name' => $validatedData['name'],
             'start' => $validatedData['start'],
             'end' => $validatedData['end'],
         ]);
-    
-     
+
+
         return response()->json(['message' => 'Sprint updated successfully.', 'sprint' => $sprint], 200);
     }
-    
-   
 
     /**
      * Remove the specified resource from storage.
@@ -97,5 +102,14 @@ class SprintController extends Controller
         $sprint = Sprint::find($sprint_id);
         $sprint->delete();
         return response()->json('Sprint is deleted successfully.');
+    }
+
+    /**
+     * Get the sprints associated with the logged-in user.
+     */
+    public function userSprints(Request $request)
+    {
+        $sprints = Sprint::find($request->user()->sprint_id);
+        return response()->json($sprints);
     }
 }
