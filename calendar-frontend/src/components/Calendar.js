@@ -8,11 +8,22 @@ import SprintForm from "./SprintForm";
 import TaskForm from "./TaskForm";
 import "../styles/Calendar.css";
 
+
 const Calendar = () => {
   const [sprints, setSprints] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [showSprintForm, setShowSprintFormState] = useState(false);
   const [showTaskForm, setShowTaskFormState] = useState(false);
+
+  //state za cuvanje informacija o sprintu koji je selektovan
+  const [selectedSprint, setSelectedSprint] = useState(null);
+  const [showSprintDetails, setShowSprintDetails] = useState(false);
+
+  const [selecetedTask, setSelectedTask] = useState(null);
+  const [showTaskDetails, setShowTaskDetails] = useState(false);
+
+ // const [refresh, setRefresh] = useState(false);
+  
 
   useEffect(() => {
     fetchSprints();
@@ -47,6 +58,8 @@ const Calendar = () => {
   const handleSprintAdded = (newSprint) => {
     setSprints((prevSprints) => [...prevSprints, newSprint]);
     setShowSprintFormState(false);
+    
+
   };
 
   // Handle adding a new task
@@ -64,12 +77,14 @@ const Calendar = () => {
           return null;
         }
         return {
+          id: sprint.id,
           title: sprint.name,
           start: sprint.start,
           end: sprint.end,
           backgroundColor: sprint.color,
           borderColor: sprint.color,
-        };
+          extendedProps: { type: "sprint" },     
+          };
       })
       .filter((event) => event !== null),
     ...(Array.isArray(tasks) ? tasks : [])
@@ -79,15 +94,78 @@ const Calendar = () => {
           return null;
         }
         return {
+          id: task.id,
           title: task.name,
           start: task.start,
           end: task.end,
           backgroundColor: task.color, // Use the custom color
           borderColor: task.color, // Use the custom color for border
+          extendedProps: { type: "task" , description: task.description, status: task.status},  
         };
       })
       .filter((event) => event !== null),
   ];
+
+  const handleEventClick = (info) => {
+    if (info.event.extendedProps.type === "sprint") {
+      setSelectedSprint({
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.start,
+        end: info.event.end,
+        color: info.event.backgroundColor,
+      });
+      setShowSprintDetails(true);
+    }
+
+    if(info.event.extendedProps.type === "task") {
+      setSelectedTask({
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.start,
+        end: info.event.end,
+        color: info.event.backgroundColor,
+        extendedProps: info.event.extendedProps,
+      });
+      setShowTaskDetails(true);
+      
+    }
+  };
+
+  //Brise sprint i iz kalendara i iz baze
+  const handleDeleteSprint = (sprintId) => {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(`http://127.0.0.1:8000/api/sprints/${sprintId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setSprints((prevSprints) => prevSprints.filter(sprint => sprint.id !== sprintId));
+        setShowSprintDetails(false);
+        //setRefresh(prev => !prev);
+
+      })
+      .catch(() => alert("Failed to delete sprint"));
+  };
+ 
+ //Brise task i iz kalendara i iz baze  
+  const handleDeleteTask = (taskId) => {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
+        setShowTaskDetails(false);
+        //setRefresh(prev => !prev);
+      })
+      .catch(() => alert("Failed to delete task"));
+  };
+  
+  
+  
+
 
   return (
     <div className="calendar-container">
@@ -117,9 +195,43 @@ const Calendar = () => {
         editable={true}
         selectable={true}
         dayMaxEventRows={true} // Ensure events are limited to rows
+        eventClick={handleEventClick}
       />
+
+      {showSprintDetails && selectedSprint && (
+  <div className="modal-sprint">
+    <div className="modal-content-sprint">
+      <h2>{selectedSprint.title}</h2>
+      <p><strong>ID:</strong> {selectedSprint.id}</p>  
+      <p><strong>Start:</strong> {selectedSprint.start.toLocaleString()}</p>
+      <p><strong>End:</strong> {selectedSprint.end.toLocaleString()}</p>
+      
+      <button onClick={() => handleDeleteSprint(selectedSprint.id)}>Delete Sprint</button>
+      <button onClick={() => setShowSprintDetails(false)}>Close</button>
+    </div>
+  </div>
+    )}
+
+      {showTaskDetails && selecetedTask && (
+      <div className="modal-task">
+        <div className="modal-content-task">
+          <h2>{selecetedTask.title}</h2>
+          <p><strong>ID:</strong> {selecetedTask.id}</p>
+          <p><strong>Description:</strong> {selecetedTask.extendedProps.description}</p>
+          <p><strong>Start:</strong> {selecetedTask.start.toLocaleString()}</p>
+          <p><strong>End:</strong> {selecetedTask.end.toLocaleString()}</p>
+          <p><strong>Status:</strong> {selecetedTask.extendedProps.status}</p>
+          
+          <button onClick={() => handleDeleteTask(selecetedTask.id)}>Delete Task</button>
+          <button onClick={() => setShowTaskDetails(false)}>Close</button>
+
+     </div>
+  </div>
+    )}
+
       {showSprintForm && (
         <SprintForm
+        //selectedSprint={selectedSprint}
           onSprintAdded={handleSprintAdded}
           fetchSprints={fetchSprints}
           onClose={() => setShowSprintFormState(false)}
