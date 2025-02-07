@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import axios from "axios";
 import "../styles/Form.css";
 
-const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
+const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -14,6 +14,40 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
     color: "#90EE90", // Default color light green
   });
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+  };
+
+useEffect(() => { 
+  if(selectedTask){
+    setFormData({
+      name: selectedTask.title || "",
+      description: selectedTask.extendedProps.description || "",
+      start: formatDate(selectedTask.start),
+      end: formatDate(selectedTask.end),
+      status: selectedTask.extendedProps.status || "",
+      user_id: selectedTask.extendedProps.user_id || "",
+      sprint_id: selectedTask.extendedProps.sprint_id || "",
+      color: selectedTask.color || "#90EE90",
+    });
+  }else{
+    setFormData({
+      name: "",
+      description: "",
+      start: "",
+      end: "",
+      status: "",
+      user_id: "",
+      sprint_id: "",
+      color: "#90EE90",
+    });
+  }
+
+
+}, [selectedTask]); 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -23,6 +57,25 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
+    if (selectedTask) {
+      // Update existing task
+      axios
+        .put(
+          `http://127.0.0.1:8000/api/tasks/${selectedTask.id}`,
+          { ...formData },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          onTaskAdded(response.data);
+          fetchTasks();
+          onClose();
+        })
+        .catch(() => alert("Failed to update task"));
+    } else { 
     axios
       .post(
         `http://127.0.0.1:8000/api/tasks`,
@@ -34,21 +87,12 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
         }
       )
       .then((response) => {
-        onTaskAdded(response.data.task);
+        onTaskAdded(response.data);
         fetchTasks();
-        setFormData({
-          name: "",
-          description: "",
-          start: "",
-          end: "",
-          status: "",
-          user_id: "",
-          sprint_id: "",
-          color: "#90EE90",
-        });
         onClose();
       })
       .catch(() => alert("Failed to add task"));
+    }
   };
 
   return (

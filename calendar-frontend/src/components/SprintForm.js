@@ -1,14 +1,39 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import axios from "axios";
 import "../styles/Form.css";
 
-const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
+const SprintForm = ({ selectedSprint, onSprintAdded, fetchSprints, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     start: "",
     end: "",
     color: "#0B0BFF", // Default color
   });
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  };
+  
+
+  useEffect(() => {
+    if (selectedSprint) {
+      setFormData({
+        name: selectedSprint.title || "",
+        start: formatDate(selectedSprint.start), 
+        end: formatDate(selectedSprint.end),
+        color: selectedSprint.color || "#0B0BFF",
+      });
+    } else {
+      setFormData({
+        name: "",
+        start: "",
+        end: "",
+        color: "#0B0BFF",
+      });
+    }
+  }, [selectedSprint]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,24 +43,42 @@ const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
-    axios
-      .post(
-        `http://127.0.0.1:8000/api/sprints`,
-        { ...formData },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => {
-        onSprintAdded(response.data.sprint);
-        fetchSprints();
-        setFormData({ name: "", start: "", end: "", color: "#0B0BFF" });
-        onClose();
-      })
-      .catch(() => alert("Failed to add sprint"));
+    if (selectedSprint) {
+      axios
+        .put(
+          `http://127.0.0.1:8000/api/sprints/${selectedSprint.id}`,
+          { ...formData },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          onSprintAdded(response.data);
+          fetchSprints();
+          onClose();
+        })
+        .catch(() => alert("Failed to update sprint"));
+    } else {
+     
+     axios
+     .post(
+       `http://127.0.0.1:8000/api/sprints`,
+       { ...formData },
+       {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       }
+     )
+     .then((response) => {
+       onSprintAdded(response.data);
+       fetchSprints();
+       onClose();
+     })
+     .catch(() => alert("Failed to add sprint"));
+ }
   };
 
   return (

@@ -15,20 +15,20 @@ const Calendar = () => {
   const [showSprintForm, setShowSprintFormState] = useState(false);
   const [showTaskForm, setShowTaskFormState] = useState(false);
 
-  //state za cuvanje informacija o sprintu koji je selektovan
   const [selectedSprint, setSelectedSprint] = useState(null);
   const [showSprintDetails, setShowSprintDetails] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [selecetedTask, setSelectedTask] = useState(null);
   const [showTaskDetails, setShowTaskDetails] = useState(false);
 
- // const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   
 
   useEffect(() => {
     fetchSprints();
     fetchTasks();
-  }, []);
+  }, [refresh]);
 
   // Fetch sprints associated with the logged-in user from the API
   const fetchSprints = () => {
@@ -58,14 +58,55 @@ const Calendar = () => {
   const handleSprintAdded = (newSprint) => {
     setSprints((prevSprints) => [...prevSprints, newSprint]);
     setShowSprintFormState(false);
-    
+    setIsEditing(false);
+  };
 
+  //Handle editing a sprint
+  const handleEditSprint = () => {
+    setIsEditing(true);
+    setShowSprintFormState(true);
+  };
+ //Handle deleting a sprint
+  const handleDeleteSprint = (sprintId) => {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(`http://127.0.0.1:8000/api/sprints/${sprintId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setSprints((prevSprints) => prevSprints.filter(sprint => sprint.id !== sprintId));
+        setShowSprintDetails(false);
+        setRefresh(prev => !prev);
+
+      })
+      .catch(() => alert("Failed to delete sprint"));
   };
 
   // Handle adding a new task
   const handleTaskAdded = (newTask) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     setShowTaskFormState(false);
+    setIsEditing(false);
+  };
+
+  const handleEditTask = () => {
+    setIsEditing(true);
+    setShowTaskFormState(true);
+  };
+  
+  //Handle deleting a task 
+  const handleDeleteTask = (taskId) => {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
+        setShowTaskDetails(false);
+        setRefresh(prev => !prev);
+      })
+      .catch(() => alert("Failed to delete task"));
   };
 
   // Prepare events for the calendar
@@ -100,7 +141,7 @@ const Calendar = () => {
           end: task.end,
           backgroundColor: task.color, // Use the custom color
           borderColor: task.color, // Use the custom color for border
-          extendedProps: { type: "task" , description: task.description, status: task.status},  
+          extendedProps: { type: "task" , description: task.description, status: task.status, user_id: task.user_id, sprint_id: task.sprint_id},  
         };
       })
       .filter((event) => event !== null),
@@ -132,41 +173,9 @@ const Calendar = () => {
     }
   };
 
-  //Brise sprint i iz kalendara i iz baze
-  const handleDeleteSprint = (sprintId) => {
-    const token = localStorage.getItem("token");
-    axios
-      .delete(`http://127.0.0.1:8000/api/sprints/${sprintId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setSprints((prevSprints) => prevSprints.filter(sprint => sprint.id !== sprintId));
-        setShowSprintDetails(false);
-        //setRefresh(prev => !prev);
-
-      })
-      .catch(() => alert("Failed to delete sprint"));
-  };
+  
  
- //Brise task i iz kalendara i iz baze  
-  const handleDeleteTask = (taskId) => {
-    const token = localStorage.getItem("token");
-    axios
-      .delete(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
-        setShowTaskDetails(false);
-        //setRefresh(prev => !prev);
-      })
-      .catch(() => alert("Failed to delete task"));
-  };
-  
-  
-  
-
-
+ 
   return (
     <div className="calendar-container">
       <FullCalendar
@@ -199,29 +208,27 @@ const Calendar = () => {
       />
 
       {showSprintDetails && selectedSprint && (
-  <div className="modal-sprint">
-    <div className="modal-content-sprint">
+      <div className="modal-sprint">
+        <div className="modal-content-sprint">
       <h2>{selectedSprint.title}</h2>
-      <p><strong>ID:</strong> {selectedSprint.id}</p>  
-      <p><strong>Start:</strong> {selectedSprint.start.toLocaleString()}</p>
-      <p><strong>End:</strong> {selectedSprint.end.toLocaleString()}</p>
-      
+      <p><strong>Start:</strong> {new Date(selectedSprint.start).toISOString().split("T")[0]}</p>
+      <p><strong>End:</strong> {new Date(selectedSprint.end).toISOString().split("T")[0]}</p>
+      <button onClick={handleEditSprint}>Edit Sprint</button>
       <button onClick={() => handleDeleteSprint(selectedSprint.id)}>Delete Sprint</button>
       <button onClick={() => setShowSprintDetails(false)}>Close</button>
-    </div>
-  </div>
+        </div>
+      </div>
     )}
 
       {showTaskDetails && selecetedTask && (
       <div className="modal-task">
         <div className="modal-content-task">
           <h2>{selecetedTask.title}</h2>
-          <p><strong>ID:</strong> {selecetedTask.id}</p>
           <p><strong>Description:</strong> {selecetedTask.extendedProps.description}</p>
+          <p><strong>Status:</strong> {selecetedTask.extendedProps.status}</p>
           <p><strong>Start:</strong> {selecetedTask.start.toLocaleString()}</p>
           <p><strong>End:</strong> {selecetedTask.end.toLocaleString()}</p>
-          <p><strong>Status:</strong> {selecetedTask.extendedProps.status}</p>
-          
+          <button onClick={handleEditTask}>Edit Task</button>
           <button onClick={() => handleDeleteTask(selecetedTask.id)}>Delete Task</button>
           <button onClick={() => setShowTaskDetails(false)}>Close</button>
 
@@ -231,17 +238,24 @@ const Calendar = () => {
 
       {showSprintForm && (
         <SprintForm
-        //selectedSprint={selectedSprint}
-          onSprintAdded={handleSprintAdded}
-          fetchSprints={fetchSprints}
-          onClose={() => setShowSprintFormState(false)}
+        selectedSprint={isEditing ? selectedSprint : null}         
+        onSprintAdded={handleSprintAdded}
+        fetchSprints={fetchSprints}
+        onClose={() => {
+          setShowSprintFormState(false);
+          setIsEditing(false);
+        }}
         />
       )}
       {showTaskForm && (
         <TaskForm
+          selectedTask={isEditing ? selecetedTask : null}
           onTaskAdded={handleTaskAdded}
           fetchTasks={fetchTasks}
-          onClose={() => setShowTaskFormState(false)}
+          onClose={() => {
+          setShowTaskFormState(false);
+          setIsEditing(false);
+          }}
         />
       )}
     </div>
