@@ -33,6 +33,7 @@ class SprintController extends Controller
             'name' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'required|date|after_or_equal:start',
+            'color' => 'required|string', // Validate color
         ]);
 
         $sprint = Sprint::create($validatedData);
@@ -81,6 +82,7 @@ class SprintController extends Controller
             'name' => 'required|string|max:255',
             'start' => 'required|date',
             'end' => 'required|date|after_or_equal:start',
+            'color' => 'required|string', // Validate color
         ]);
 
 
@@ -88,6 +90,7 @@ class SprintController extends Controller
             'name' => $validatedData['name'],
             'start' => $validatedData['start'],
             'end' => $validatedData['end'],
+            'color' => $validatedData['color'], // Update color
         ]);
 
 

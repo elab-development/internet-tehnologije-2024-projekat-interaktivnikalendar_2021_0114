@@ -38,6 +38,7 @@ class TaskController extends Controller
             'status' => 'required|string',
             'user_id' => 'required|exists:users,id',
             'sprint_id' => 'required|exists:sprints,id',
+            'color' => 'required|string',
         ]);
 
         $task = Task::create($validatedData);
@@ -85,7 +86,7 @@ class TaskController extends Controller
             'status' => 'required|string',
             'user_id' => 'required|exists:users,id',
             'sprint_id' => 'required|exists:sprints,id',
-
+            'color' => 'required|string',
         ]);
 
 
@@ -97,6 +98,7 @@ class TaskController extends Controller
             'status' => $validatedData['status'],
             'user_id' => $validatedData['user_id'],
             'sprint_id' => $validatedData['sprint_id'],
+            'color' => $validatedData['color'],
         ]);
 
 

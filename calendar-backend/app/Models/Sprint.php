@@ -12,7 +12,8 @@ class Sprint extends Model
     protected $fillable = [
         'name',
         'start',
-        'end'
+        'end',
+        'color', // Add color attribute
     ];
 
     public function users()

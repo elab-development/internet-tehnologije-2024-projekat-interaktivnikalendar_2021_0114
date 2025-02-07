@@ -7,6 +7,7 @@ const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
     name: "",
     start: "",
     end: "",
+    color: "#0B0BFF", // Default color
   });
 
   const handleInputChange = (e) => {
@@ -31,7 +32,7 @@ const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
       .then((response) => {
         onSprintAdded(response.data.sprint);
         fetchSprints();
-        setFormData({ name: "", start: "", end: "" });
+        setFormData({ name: "", start: "", end: "", color: "#0B0BFF" });
         onClose();
       })
       .catch(() => alert("Failed to add sprint"));
@@ -68,6 +69,16 @@ const SprintForm = ({ onSprintAdded, fetchSprints, onClose }) => {
               type="date"
               name="end"
               value={formData.end}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-color">
+            <label>Color:</label>
+            <input
+              type="color"
+              name="color"
+              value={formData.color}
               onChange={handleInputChange}
               required
             />

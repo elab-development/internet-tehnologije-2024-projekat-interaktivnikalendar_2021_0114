@@ -67,6 +67,8 @@ const Calendar = () => {
           title: sprint.name,
           start: sprint.start,
           end: sprint.end,
+          backgroundColor: sprint.color,
+          borderColor: sprint.color,
         };
       })
       .filter((event) => event !== null),
@@ -80,6 +82,8 @@ const Calendar = () => {
           title: task.name,
           start: task.start,
           end: task.end,
+          backgroundColor: task.color, // Use the custom color
+          borderColor: task.color, // Use the custom color for border
         };
       })
       .filter((event) => event !== null),

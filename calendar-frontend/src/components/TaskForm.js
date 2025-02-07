@@ -8,9 +8,10 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
     description: "",
     start: "",
     end: "",
-    status:"",
-    user_id:"",
-    sprint_id:"",
+    status: "",
+    user_id: "",
+    sprint_id: "",
+    color: "#90EE90", // Default color light green
   });
 
   const handleInputChange = (e) => {
@@ -35,7 +36,16 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
       .then((response) => {
         onTaskAdded(response.data.task);
         fetchTasks();
-        setFormData({ name: "", description:"", start: "", end: "" , status:"", user_id:"", sprint_id:""});
+        setFormData({
+          name: "",
+          description: "",
+          start: "",
+          end: "",
+          status: "",
+          user_id: "",
+          sprint_id: "",
+          color: "#90EE90",
+        });
         onClose();
       })
       .catch(() => alert("Failed to add task"));
@@ -63,7 +73,6 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              required
             />
           </div>
           <div>
@@ -116,8 +125,20 @@ const TaskForm = ({ onTaskAdded, fetchTasks, onClose }) => {
               required
             />
           </div>
+          <div className="form-color">
+            <label>Color:</label>
+            <input
+              type="color"
+              name="color"
+              value={formData.color}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
           <button type="submit">Add Task</button>
-          <button type="button" className="close-button" onClick={onClose}>Cancel</button>
+          <button type="button" className="close-button" onClick={onClose}>
+            Cancel
+          </button>
         </form>
       </div>
     </div>
