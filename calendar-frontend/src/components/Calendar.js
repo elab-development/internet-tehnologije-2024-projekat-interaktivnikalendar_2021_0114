@@ -172,6 +172,50 @@ const Calendar = () => {
       
     }
   };
+  //Moving events in calendar and updating the database 
+  const handleEventDrop = async (info) => {
+    //console.log("Pomeren event:", info.event);
+    const { id, title, start, end, backgroundColor, extendedProps } = info.event;
+    const token = localStorage.getItem("token");
+  
+    let updatedData = {
+        name: title,
+        start: start.toISOString().split('T')[0], //formating date to string
+        end: end ? end.toISOString().split('T')[0] : start.toISOString().split('T')[0],
+        color: backgroundColor,
+    };
+    if (extendedProps.type === "task") {
+        updatedData = {
+            ...updatedData,
+            description: extendedProps.description,
+            status: extendedProps.status,
+            user_id: extendedProps.user_id,
+            sprint_id: extendedProps.sprint_id,
+        };
+    }
+    const apiUrl =
+        extendedProps.type === "sprint"
+            ? `http://127.0.0.1:8000/api/sprints/${id}`
+            : `http://127.0.0.1:8000/api/tasks/${id}`;
+    try {
+        const response = await fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify(updatedData),
+        });
+        if (!response.ok) {
+            throw new Error(`Greška: ${response.status} - ${response.statusText}`);
+        }
+        console.log("Uspešno ažurirano!", await response.json());
+    } catch (error) {
+        console.error("Nešto nije u redu:", error);
+        info.revert(); // Revert the changes if an error occurs
+    }
+};
 
  
  
@@ -204,6 +248,7 @@ const Calendar = () => {
         selectable={true}
         dayMaxEventRows={true} // Ensure events are limited to rows
         eventClick={handleEventClick}
+        eventDrop={handleEventDrop}
       />
 
       {showSprintDetails && selectedSprint && (
