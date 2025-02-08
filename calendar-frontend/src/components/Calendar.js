@@ -174,16 +174,18 @@ const Calendar = () => {
   };
   //Moving events in calendar and updating the database 
   const handleEventDrop = async (info) => {
-    //console.log("Pomeren event:", info.event);
+    console.log("Pomeren event:", info.event);
+
     const { id, title, start, end, backgroundColor, extendedProps } = info.event;
     const token = localStorage.getItem("token");
-  
+
     let updatedData = {
         name: title,
-        start: start.toISOString().split('T')[0], //formating date to string
+        start: start.toISOString().split('T')[0],
         end: end ? end.toISOString().split('T')[0] : start.toISOString().split('T')[0],
         color: backgroundColor,
     };
+
     if (extendedProps.type === "task") {
         updatedData = {
             ...updatedData,
@@ -193,29 +195,26 @@ const Calendar = () => {
             sprint_id: extendedProps.sprint_id,
         };
     }
+
     const apiUrl =
         extendedProps.type === "sprint"
             ? `http://127.0.0.1:8000/api/sprints/${id}`
             : `http://127.0.0.1:8000/api/tasks/${id}`;
+
     try {
-        const response = await fetch(apiUrl, {
-            method: "PUT",
+        const response = await axios.put(apiUrl, updatedData, {
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(updatedData),
         });
-        if (!response.ok) {
-            throw new Error(`Greška: ${response.status} - ${response.statusText}`);
-        }
-        console.log("Uspešno ažurirano!", await response.json());
+
+        console.log("Uspešno ažurirano!", response.data);
     } catch (error) {
         console.error("Nešto nije u redu:", error);
-        info.revert(); // Revert the changes if an error occurs
+        info.revert(); // Ako API ne uspe, vrati događaj nazad
     }
 };
+
 
  
  
