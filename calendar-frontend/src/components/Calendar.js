@@ -182,10 +182,9 @@ const Calendar = () => {
     const { id, title, start, end, backgroundColor, extendedProps } = info.event;
     const token = localStorage.getItem("token");
 
-  
     let updatedData = {
         name: title,
-        start: start.toISOString().split('T')[0], //formating date to string
+        start: start.toISOString().split('T')[0],
         end: end ? end.toISOString().split('T')[0] : start.toISOString().split('T')[0],
         color: backgroundColor,
     };
@@ -206,31 +205,20 @@ const Calendar = () => {
             : `http://127.0.0.1:8000/api/tasks/${id}`;
 
     try {
-        const response = await fetch(apiUrl, {
-            method: "PUT",
+        const response = await axios.put(apiUrl, updatedData, {
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(updatedData),
         });
 
-        if (!response.ok) {
-            throw new Error(`Greška: ${response.status} - ${response.statusText}`);
-        }
-
-        console.log("Uspešno ažurirano!", await response.json());
+        console.log("Update success!", response.data);
     } catch (error) {
-        console.error("Nešto nije u redu:", error);
-        info.revert(); // Revert the changes if an error occurs
+        console.error("ERROR", error);
+        info.revert(); // Ako API ne uspe, vrati događaj nazad
     }
 };
 
 
-
- 
- 
   return (
     <div className="calendar-container">
       <FullCalendar
