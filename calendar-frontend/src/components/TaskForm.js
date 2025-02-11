@@ -92,6 +92,8 @@ useEffect(() => {
         onClose();
       })
       .catch(() => alert("Failed to add task"));
+      console.log(formData);
+
     }
   };
 

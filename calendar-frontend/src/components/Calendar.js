@@ -23,11 +23,14 @@ const Calendar = () => {
   const [showTaskDetails, setShowTaskDetails] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
+
+  const[holidays,setHolidays] = useState([]);
   
 
   useEffect(() => {
     fetchSprints();
     fetchTasks();
+    fetchHolidays();
   }, [refresh]);
 
   // Fetch sprints associated with the logged-in user from the API
@@ -38,6 +41,7 @@ const Calendar = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        console.log("Sprints:", response.data);
         setSprints([response.data]);
       })
       .catch(() => alert("Failed to fetch sprints"));
@@ -53,6 +57,34 @@ const Calendar = () => {
       .then((response) => setTasks(response.data))
       .catch(() => alert("Failed to fetch tasks"));
   };
+
+  //fetch holidays from the API 
+  const fetchHolidays = () => {
+    const apiKey='XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo'; //from calendarific.com
+    const country='RS';
+    const year='2025';
+    const url = `https://calendarific.com/api/v2/holidays?&api_key=${apiKey}&country=${country}&year=${year}`;
+
+    axios
+    .get(url)
+    .then((response) => {
+      const holidays = response.data.response.holidays.map((holiday) => ({
+        id: `holiday-${holiday.date.iso}`,
+        title: holiday.name,
+        start: holiday.date.iso,
+        allDay: true,
+        backgroundColor: "red",
+        borderColor: "red",
+        extendedProps: { type: "holiday" },
+      }));
+      console.log("Holidays:", holidays);
+      setHolidays(holidays);
+      
+    })
+    .catch(() => alert("Failed to fetch holidays"));
+};
+
+
 
   // Handle adding a new sprint
   const handleSprintAdded = (newSprint) => {
@@ -146,6 +178,7 @@ const Calendar = () => {
         };
       })
       .filter((event) => event !== null),
+      ...holidays,  
   ];
 
   const convertToLocalDate = (dateString) => {
@@ -249,9 +282,6 @@ const Calendar = () => {
     }
 };
 
-
- 
- 
   return (
     <div className="calendar-container">
       <FullCalendar
