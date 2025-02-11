@@ -126,6 +126,7 @@ const Calendar = () => {
           borderColor: sprint.color,
           extendedProps: { type: "sprint" },     
           };
+          
       })
       .filter((event) => event !== null),
     ...(Array.isArray(tasks) ? tasks : [])
@@ -147,15 +148,25 @@ const Calendar = () => {
       .filter((event) => event !== null),
   ];
 
+  const convertToLocalDate = (dateString) => {
+    if (!dateString) return "";
+    
+    const utcDate = new Date(dateString);
+    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+    
+    return localDate.toISOString().split("T")[0]; // YYYY-MM-DD
+};
   const handleEventClick = (info) => {
+   
     if (info.event.extendedProps.type === "sprint") {
       setSelectedSprint({
         id: info.event.id,
         title: info.event.title,
-        start: info.event.start,
-        end: info.event.end,
+        start: convertToLocalDate(info.event.start),
+        end: convertToLocalDate(info.event.end),
         color: info.event.backgroundColor,
       });
+      console.log("Sprint:", selectedSprint);
       setShowSprintDetails(true);
     }
 
@@ -168,10 +179,13 @@ const Calendar = () => {
         color: info.event.backgroundColor,
         extendedProps: info.event.extendedProps,
       });
+      console.log("Task:", selecetedTask);  
       setShowTaskDetails(true);
       
     }
   };
+
+
   //Moving events in calendar and updating the database 
   const handleEventDrop = async (info) => {
     console.log("Pomeren event:", info.event);
@@ -179,10 +193,25 @@ const Calendar = () => {
     const { id, title, start, end, backgroundColor, extendedProps } = info.event;
     const token = localStorage.getItem("token");
 
+    // Format za sprint (samo datum)
+    const formatDateForSprint = (date) => {
+      if (!date) return "";
+      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return localDate.toISOString().split("T")[0]; // YYYY-MM-DD
+  };
+
+  // Format za task (datum + sat i minut)
+  const formatDateTimeForTask = (date) => {
+      if (!date) return "";
+      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return localDate.toISOString().replace("T", " ").split(".")[0]; // YYYY-MM-DD HH:MM:SS
+  };
+  
+
     let updatedData = {
         name: title,
-        start: start.toISOString().split('T')[0],
-        end: end ? end.toISOString().split('T')[0] : start.toISOString().split('T')[0],
+        start: extendedProps.type === "sprint" ? formatDateForSprint(start) : formatDateTimeForTask(start),
+        end: extendedProps.type === "sprint" ? formatDateForSprint(end) : formatDateTimeForTask(end),
         color: backgroundColor,
     };
 
@@ -195,7 +224,7 @@ const Calendar = () => {
             sprint_id: extendedProps.sprint_id,
         };
     }
-
+    console.log("saljem:", updatedData);
     const apiUrl =
         extendedProps.type === "sprint"
             ? `http://127.0.0.1:8000/api/sprints/${id}`
@@ -207,10 +236,15 @@ const Calendar = () => {
                 Authorization: `Bearer ${token}`,
             },
         });
-
+        
         console.log("Uspešno ažurirano!", response.data);
+        
+  
+        
     } catch (error) {
         console.error("Nešto nije u redu:", error);
+        console.log("Podaci koji se šalju:", updatedData);  
+
         info.revert(); // Ako API ne uspe, vrati događaj nazad
     }
 };
