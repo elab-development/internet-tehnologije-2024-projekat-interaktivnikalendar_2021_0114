@@ -7,7 +7,10 @@ import interactionPlugin from "@fullcalendar/interaction";
 import SprintForm from "./SprintForm";
 import TaskForm from "./TaskForm";
 import "../styles/Calendar.css";
-
+import SprintModal from "./SprintModal";
+import TaskModal from "./TaskModal";
+import { formatDateForSprint, formatDateTimeForTask, convertToLocalDate } from "./utils";
+import { fetchSprints, fetchTasks, fetchHolidays, deleteSprint, deleteTask } from "./api";
 
 const Calendar = () => {
   const [sprints, setSprints] = useState([]);
@@ -19,7 +22,7 @@ const Calendar = () => {
   const [showSprintDetails, setShowSprintDetails] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [selecetedTask, setSelectedTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskDetails, setShowTaskDetails] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
@@ -28,61 +31,27 @@ const Calendar = () => {
   
 
   useEffect(() => {
-    fetchSprints();
-    fetchTasks();
-    fetchHolidays();
+    const apiKey = 'XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo';
+    const country = 'RS';
+    const year = 2025;
+
+    const fetchData = async () => {
+      try {
+        const [sprintsData, tasksData, holidaysData] = await Promise.all([
+          fetchSprints(),
+          fetchTasks(),
+          fetchHolidays(apiKey, country, year)
+        ]);
+        setSprints(sprintsData);
+        setTasks(tasksData);
+        setHolidays(holidaysData);
+      } catch (error) {
+        alert("Failed to fetch data");
+      }
+    };
+
+    fetchData();
   }, [refresh]);
-
-  // Fetch sprints associated with the logged-in user from the API
-  const fetchSprints = () => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://127.0.0.1:8000/api/user/sprints", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        console.log("Sprints:", response.data);
-        setSprints([response.data]);
-      })
-      .catch(() => alert("Failed to fetch sprints"));
-  };
-
-  // Fetch tasks from the API
-  const fetchTasks = () => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://127.0.0.1:8000/api/tasks", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => setTasks(response.data))
-      .catch(() => alert("Failed to fetch tasks"));
-  };
-
-  //fetch holidays from the API 
-  const fetchHolidays = () => {
-    const apiKey='XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo'; //from calendarific.com
-    const country='RS';
-    const year='2025';
-    const url = `https://calendarific.com/api/v2/holidays?&api_key=${apiKey}&country=${country}&year=${year}`;
-
-    axios
-    .get(url)
-    .then((response) => {
-      const holidays = response.data.response.holidays.map((holiday) => ({
-        id: `holiday-${holiday.date.iso}`,
-        title: holiday.name,
-        start: holiday.date.iso,
-        allDay: true,
-        backgroundColor: "red",
-        borderColor: "red",
-        extendedProps: { type: "holiday" },
-      }));
-      console.log("Holidays:", holidays);
-      setHolidays(holidays);
-      
-    })
-    .catch(() => alert("Failed to fetch holidays"));
-};
 
 
 
@@ -99,20 +68,16 @@ const Calendar = () => {
     setShowSprintFormState(true);
   };
  //Handle deleting a sprint
-  const handleDeleteSprint = (sprintId) => {
-    const token = localStorage.getItem("token");
-    axios
-      .delete(`http://127.0.0.1:8000/api/sprints/${sprintId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setSprints((prevSprints) => prevSprints.filter(sprint => sprint.id !== sprintId));
-        setShowSprintDetails(false);
-        setRefresh(prev => !prev);
-
-      })
-      .catch(() => alert("Failed to delete sprint"));
-  };
+ const handleDeleteSprint = async (sprintId) => {
+  try {
+    await deleteSprint(sprintId);
+    setSprints((prevSprints) => prevSprints.filter((sprint) => sprint.id !== sprintId));
+    setShowSprintDetails(false);
+    setRefresh((prev) => !prev);
+  } catch {
+    alert("Failed to delete sprint");
+  }
+};
 
   // Handle adding a new task
   const handleTaskAdded = (newTask) => {
@@ -127,18 +92,15 @@ const Calendar = () => {
   };
   
   //Handle deleting a task 
-  const handleDeleteTask = (taskId) => {
-    const token = localStorage.getItem("token");
-    axios
-      .delete(`http://127.0.0.1:8000/api/tasks/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
-        setShowTaskDetails(false);
-        setRefresh(prev => !prev);
-      })
-      .catch(() => alert("Failed to delete task"));
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      setShowTaskDetails(false);
+      setRefresh((prev) => !prev);
+    } catch {
+      alert("Failed to delete task");
+    }
   };
 
   // Prepare events for the calendar
@@ -181,14 +143,6 @@ const Calendar = () => {
       ...holidays,  
   ];
 
-  const convertToLocalDate = (dateString) => {
-    if (!dateString) return "";
-    
-    const utcDate = new Date(dateString);
-    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
-    
-    return localDate.toISOString().split("T")[0]; // YYYY-MM-DD
-};
   const handleEventClick = (info) => {
    
     if (info.event.extendedProps.type === "sprint") {
@@ -212,7 +166,7 @@ const Calendar = () => {
         color: info.event.backgroundColor,
         extendedProps: info.event.extendedProps,
       });
-      console.log("Task:", selecetedTask);  
+      console.log("Task:", selectedTask);  
       setShowTaskDetails(true);
       
     }
@@ -225,21 +179,6 @@ const Calendar = () => {
 
     const { id, title, start, end, backgroundColor, extendedProps } = info.event;
     const token = localStorage.getItem("token");
-
-    // Format za sprint (samo datum)
-    const formatDateForSprint = (date) => {
-      if (!date) return "";
-      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-      return localDate.toISOString().split("T")[0]; // YYYY-MM-DD
-  };
-
-  // Format za task (datum + sat i minut)
-  const formatDateTimeForTask = (date) => {
-      if (!date) return "";
-      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-      return localDate.toISOString().replace("T", " ").split(".")[0]; // YYYY-MM-DD HH:MM:SS
-  };
-  
 
     let updatedData = {
         name: title,
@@ -270,14 +209,9 @@ const Calendar = () => {
             },
         });
         
-        console.log("Uspešno ažurirano!", response.data);
-        
-  
-        
+       console.log("Uspešno ažurirano!", response.data);
     } catch (error) {
-        console.error("Nešto nije u redu:", error);
-        console.log("Podaci koji se šalju:", updatedData);  
-
+        //console.log("Podaci koji se šalju:", updatedData);  
         info.revert(); // Ako API ne uspe, vrati događaj nazad
     }
 };
@@ -310,37 +244,27 @@ const Calendar = () => {
         editable={true}
         selectable={true}
         dayMaxEventRows={true} // Ensure events are limited to rows
+        firstDay={1}
         eventClick={handleEventClick}
         eventDrop={handleEventDrop}
       />
 
       {showSprintDetails && selectedSprint && (
-      <div className="modal-sprint">
-        <div className="modal-content-sprint">
-      <h2>{selectedSprint.title}</h2>
-      <p><strong>Start:</strong> {new Date(selectedSprint.start).toISOString().split("T")[0]}</p>
-      <p><strong>End:</strong> {new Date(selectedSprint.end).toISOString().split("T")[0]}</p>
-      <button onClick={handleEditSprint}>Edit Sprint</button>
-      <button onClick={() => handleDeleteSprint(selectedSprint.id)}>Delete Sprint</button>
-      <button onClick={() => setShowSprintDetails(false)}>Close</button>
-        </div>
-      </div>
+      <SprintModal
+      sprint={selectedSprint}
+      onEdit={handleEditSprint}
+      onDelete={handleDeleteSprint}
+      onClose={() => setShowSprintDetails(false)}
+      />
     )}
 
-      {showTaskDetails && selecetedTask && (
-      <div className="modal-task">
-        <div className="modal-content-task">
-          <h2>{selecetedTask.title}</h2>
-          <p><strong>Description:</strong> {selecetedTask.extendedProps.description}</p>
-          <p><strong>Status:</strong> {selecetedTask.extendedProps.status}</p>
-          <p><strong>Start:</strong> {selecetedTask.start.toLocaleString()}</p>
-          <p><strong>End:</strong> {selecetedTask.end.toLocaleString()}</p>
-          <button onClick={handleEditTask}>Edit Task</button>
-          <button onClick={() => handleDeleteTask(selecetedTask.id)}>Delete Task</button>
-          <button onClick={() => setShowTaskDetails(false)}>Close</button>
-
-     </div>
-  </div>
+      {showTaskDetails && selectedTask && (
+      <TaskModal
+      task={selectedTask}
+      onEdit={handleEditTask}
+      onDelete={handleDeleteTask}
+      onClose={() => setShowTaskDetails(false)}
+      />
     )}
 
       {showSprintForm && (
@@ -357,7 +281,7 @@ const Calendar = () => {
       )}
       {showTaskForm && (
         <TaskForm
-          selectedTask={isEditing ? selecetedTask : null}
+          selectedTask={isEditing ? selectedTask : null}
           onTaskAdded={handleTaskAdded}
           fetchTasks={fetchTasks}
           onClose={() => {
