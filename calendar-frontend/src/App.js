@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Sidebar from "./components/Sidebar";
 import PrivateRoute from "./components/PrivateRoute";
+import Teams from "./pages/Teams";
 
 function App() {
   return (
@@ -33,8 +34,15 @@ function App() {
               </div>
             }
           />
+          <Route
+            path="teams"
+            element={
+              <PrivateRoute>
+                <Teams />
+              </PrivateRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
-          
         </Routes>
       </div>
     </BrowserRouter>

@@ -62,7 +62,7 @@ const Sidebar = () => {
             Kanban
           </NavLink>
 
-          <NavLink to="/team" className="icon-and-link">
+          <NavLink to="/teams" className="icon-and-link">
             <IoPeople className="sidebar-icon" />
             Team
           </NavLink>

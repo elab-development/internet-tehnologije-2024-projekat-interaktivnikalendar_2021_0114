@@ -7,7 +7,7 @@ export const fetchSprints = async () => {
   const response = await axios.get(`${API_BASE_URL}/user/sprints`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return [response.data];
+  return response.data;
 };
 
 export const fetchTasks = async () => {
@@ -19,12 +19,15 @@ export const fetchTasks = async () => {
 };
 
 export const fetchHolidays = async (apiKey, country, year) => {
-  const url = `https://calendarific.com/api/v2/holidays?&api_key=${apiKey}&country=${country}&year=${year}`;
+  const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=EN&validFrom=${year}-01-01&validTo=${
+    year + 2
+  }-12-31`;
   const response = await axios.get(url);
-  return response.data.response.holidays.map((holiday) => ({
-    id: `holiday-${holiday.date.iso}`,
-    title: holiday.name,
-    start: holiday.date.iso,
+  console.log(response.data);
+  return response.data.map((holiday) => ({
+    id: `holiday-${holiday.startDate}`,
+    title: holiday.name[0].text,
+    start: holiday.startDate,
     allDay: true,
     backgroundColor: "red",
     borderColor: "red",

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sprint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SprintController extends Controller
 {
@@ -112,7 +113,8 @@ class SprintController extends Controller
      */
     public function userSprints(Request $request)
     {
-        $sprints = Sprint::find($request->user()->sprint_id);
+        $user = $request->user();
+        $sprints = $user->sprints()->get();
         return response()->json($sprints);
     }
 }
