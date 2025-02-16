@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -9,89 +9,99 @@ import TaskForm from "./TaskForm";
 import "../styles/Calendar.css";
 import SprintModal from "./SprintModal";
 import TaskModal from "./TaskModal";
-import { formatDateForSprint, formatDateTimeForTask, convertToLocalDate } from "./utils";
-import { fetchSprints, fetchTasks, fetchHolidays, deleteSprint, deleteTask } from "./api";
+import {
+  formatDateForSprint,
+  formatDateTimeForTask,
+  convertToLocalDate,
+} from "./utils";
+import {
+  fetchSprints,
+  fetchTasks,
+  fetchHolidays,
+  deleteSprint,
+  deleteTask,
+} from "./api";
 
 const Calendar = () => {
-  const [sprints, setSprints] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [showSprintForm, setShowSprintFormState] = useState(false);
-  const [showTaskForm, setShowTaskFormState] = useState(false);
-
-  const [selectedSprint, setSelectedSprint] = useState(null);
-  const [showSprintDetails, setShowSprintDetails] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-
+  const [showTaskForm, setShowTaskForm] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskDetails, setShowTaskDetails] = useState(false);
 
+  const [sprints, setSprints] = useState([]);
+  const [showSprintForm, setShowSprintForm] = useState(false);
+  const [selectedSprint, setSelectedSprint] = useState(null);
+  const [showSprintDetails, setShowSprintDetails] = useState(false);
+
+  const [isEditing, setIsEditing] = useState(false);
+
   const [refresh, setRefresh] = useState(false);
 
-  const[holidays,setHolidays] = useState([]);
-  
+  const [holidays, setHolidays] = useState([]);
+
+  const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
+  const country = "RS";
+  const year = 2025;
+
+  const fetchData = async () => {
+    try {
+      console.log("Fetching data...");
+      const [sprintsData, tasksData, holidaysData] = await Promise.all([
+        fetchSprints(),
+        fetchTasks(),
+        fetchHolidays(apiKey, country, year),
+      ]);
+      setSprints(sprintsData);
+      setTasks(tasksData);
+      setHolidays(holidaysData);
+    } catch (error) {
+      alert("Failed to fetch data");
+    }
+  };
 
   useEffect(() => {
-    const apiKey = 'XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo';
-    const country = 'RS';
-    const year = 2025;
-
-    const fetchData = async () => {
-      try {
-        const [sprintsData, tasksData, holidaysData] = await Promise.all([
-          fetchSprints(),
-          fetchTasks(),
-          fetchHolidays(apiKey, country, year)
-        ]);
-        setSprints(sprintsData);
-        setTasks(tasksData);
-        setHolidays(holidaysData);
-      } catch (error) {
-        alert("Failed to fetch data");
-      }
-    };
-
     fetchData();
   }, [refresh]);
 
-
-
-  // Handle adding a new sprint
+  // ------ Sprint handling ------
   const handleSprintAdded = (newSprint) => {
     setSprints((prevSprints) => [...prevSprints, newSprint]);
-    setShowSprintFormState(false);
+    setShowSprintForm(false);
     setIsEditing(false);
+    setRefresh((prev) => !prev);
   };
 
-  //Handle editing a sprint
   const handleEditSprint = () => {
     setIsEditing(true);
-    setShowSprintFormState(true);
+    setShowSprintForm(true);
   };
- //Handle deleting a sprint
- const handleDeleteSprint = async (sprintId) => {
-  try {
-    await deleteSprint(sprintId);
-    setSprints((prevSprints) => prevSprints.filter((sprint) => sprint.id !== sprintId));
-    setShowSprintDetails(false);
-    setRefresh((prev) => !prev);
-  } catch {
-    alert("Failed to delete sprint");
-  }
-};
 
-  // Handle adding a new task
+  const handleDeleteSprint = async (sprintId) => {
+    try {
+      await deleteSprint(sprintId);
+      setSprints((prevSprints) =>
+        prevSprints.filter((sprint) => sprint.id !== sprintId)
+      );
+      setShowSprintDetails(false);
+      setRefresh((prev) => !prev);
+    } catch {
+      alert("Failed to delete sprint");
+    }
+  };
+
+  // ------ Task handling ------
   const handleTaskAdded = (newTask) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
-    setShowTaskFormState(false);
+    setShowTaskForm(false);
     setIsEditing(false);
+    setRefresh((prev) => !prev);
   };
 
   const handleEditTask = () => {
     setIsEditing(true);
-    setShowTaskFormState(true);
+    setShowTaskForm(true);
   };
-  
-  //Handle deleting a task 
+
   const handleDeleteTask = async (taskId) => {
     try {
       await deleteTask(taskId);
@@ -103,9 +113,9 @@ const Calendar = () => {
     }
   };
 
-  // Prepare events for the calendar
-  const events = [
-    ...(Array.isArray(sprints) ? sprints : [])
+  const prepareSprintEvents = (sprints) => {
+    console.log("Prepare Sprints:");
+    return (Array.isArray(sprints) ? sprints : [])
       .map((sprint) => {
         if (!sprint || !sprint.name || !sprint.start || !sprint.end) {
           console.error("Invalid sprint data:", sprint);
@@ -118,12 +128,14 @@ const Calendar = () => {
           end: sprint.end,
           backgroundColor: sprint.color,
           borderColor: sprint.color,
-          extendedProps: { type: "sprint" },     
-          };
-          
+          extendedProps: { type: "sprint" },
+        };
       })
-      .filter((event) => event !== null),
-    ...(Array.isArray(tasks) ? tasks : [])
+      .filter((event) => event !== null);
+  };
+
+  const prepareTaskEvents = (tasks) => {
+    return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
         if (!task || !task.name || !task.start || !task.end) {
           console.error("Invalid task data:", task);
@@ -136,15 +148,28 @@ const Calendar = () => {
           end: task.end,
           backgroundColor: task.color, // Use the custom color
           borderColor: task.color, // Use the custom color for border
-          extendedProps: { type: "task" , description: task.description, status: task.status, user_id: task.user_id, sprint_id: task.sprint_id},  
+          extendedProps: {
+            type: "task",
+            description: task.description,
+            status: task.status,
+            user_id: task.user_id,
+            sprint_id: task.sprint_id,
+          },
         };
       })
-      .filter((event) => event !== null),
-      ...holidays,  
-  ];
+      .filter((event) => event !== null);
+  };
+
+  // Memoize the events array to prevent unnecessary recalculations on every render
+  const events = useMemo(() => {
+    return [
+      ...prepareSprintEvents(sprints),
+      ...prepareTaskEvents(tasks),
+      ...holidays,
+    ];
+  }, [sprints, tasks, holidays]);
 
   const handleEventClick = (info) => {
-   
     if (info.event.extendedProps.type === "sprint") {
       setSelectedSprint({
         id: info.event.id,
@@ -153,11 +178,11 @@ const Calendar = () => {
         end: convertToLocalDate(info.event.end),
         color: info.event.backgroundColor,
       });
-      console.log("Sprint:", selectedSprint);
       setShowSprintDetails(true);
+      setShowTaskDetails(false);
     }
 
-    if(info.event.extendedProps.type === "task") {
+    if (info.event.extendedProps.type === "task") {
       setSelectedTask({
         id: info.event.id,
         title: info.event.title,
@@ -166,55 +191,56 @@ const Calendar = () => {
         color: info.event.backgroundColor,
         extendedProps: info.event.extendedProps,
       });
-      console.log("Task:", selectedTask);  
       setShowTaskDetails(true);
-      
+      setShowSprintDetails(false);
     }
   };
 
-
-  //Moving events in calendar and updating the database 
+  //Moving events in calendar and updating the database
   const handleEventDrop = async (info) => {
-    console.log("Pomeren event:", info.event);
-
-    const { id, title, start, end, backgroundColor, extendedProps } = info.event;
+    const { id, title, start, end, backgroundColor, extendedProps } =
+      info.event;
     const token = localStorage.getItem("token");
 
     let updatedData = {
-        name: title,
-        start: extendedProps.type === "sprint" ? formatDateForSprint(start) : formatDateTimeForTask(start),
-        end: extendedProps.type === "sprint" ? formatDateForSprint(end) : formatDateTimeForTask(end),
-        color: backgroundColor,
+      name: title,
+      start:
+        extendedProps.type === "sprint"
+          ? formatDateForSprint(start)
+          : formatDateTimeForTask(start),
+      end:
+        extendedProps.type === "sprint"
+          ? formatDateForSprint(end)
+          : formatDateTimeForTask(end),
+      color: backgroundColor,
     };
 
     if (extendedProps.type === "task") {
-        updatedData = {
-            ...updatedData,
-            description: extendedProps.description,
-            status: extendedProps.status,
-            user_id: extendedProps.user_id,
-            sprint_id: extendedProps.sprint_id,
-        };
+      updatedData = {
+        ...updatedData,
+        description: extendedProps.description,
+        status: extendedProps.status,
+        user_id: extendedProps.user_id,
+        sprint_id: extendedProps.sprint_id,
+      };
     }
-    console.log("saljem:", updatedData);
+
     const apiUrl =
-        extendedProps.type === "sprint"
-            ? `http://127.0.0.1:8000/api/sprints/${id}`
-            : `http://127.0.0.1:8000/api/tasks/${id}`;
+      extendedProps.type === "sprint"
+        ? `http://127.0.0.1:8000/api/sprints/${id}`
+        : `http://127.0.0.1:8000/api/tasks/${id}`;
 
     try {
-        const response = await axios.put(apiUrl, updatedData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        
-       console.log("Uspešno ažurirano!", response.data);
+      await axios.put(apiUrl, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRefresh((prev) => !prev);
     } catch (error) {
-        //console.log("Podaci koji se šalju:", updatedData);  
-        info.revert(); // Ako API ne uspe, vrati događaj nazad
+      info.revert(); // Ako API ne uspe, vrati događaj nazad
     }
-};
+  };
 
   return (
     <div className="calendar-container">
@@ -233,11 +259,11 @@ const Calendar = () => {
         customButtons={{
           createSprintButton: {
             text: "Create Sprint",
-            click: () => setShowSprintFormState(true),
+            click: () => setShowSprintForm(true),
           },
           createTaskButton: {
             text: "Create Task",
-            click: () => setShowTaskFormState(true),
+            click: () => setShowTaskForm(true),
           },
         }}
         events={events}
@@ -250,44 +276,45 @@ const Calendar = () => {
       />
 
       {showSprintDetails && selectedSprint && (
-      <SprintModal
-      sprint={selectedSprint}
-      onEdit={handleEditSprint}
-      onDelete={handleDeleteSprint}
-      onClose={() => setShowSprintDetails(false)}
-      />
-    )}
+        <SprintModal
+          sprint={selectedSprint}
+          onEdit={handleEditSprint}
+          onDelete={handleDeleteSprint}
+          onClose={() => setShowSprintDetails(false)}
+        />
+      )}
 
       {showTaskDetails && selectedTask && (
-      <TaskModal
-      task={selectedTask}
-      onEdit={handleEditTask}
-      onDelete={handleDeleteTask}
-      onClose={() => setShowTaskDetails(false)}
-      />
-    )}
+        <TaskModal
+          task={selectedTask}
+          onEdit={handleEditTask}
+          onDelete={handleDeleteTask}
+          onClose={() => setShowTaskDetails(false)}
+        />
+      )}
 
       {showSprintForm && (
         <SprintForm
-        selectedSprint={isEditing ? selectedSprint : null}         
-        onSprintAdded={handleSprintAdded}
-        fetchSprints={fetchSprints}
-        onClose={() => {
-          setShowSprintDetails(false);
-          setShowSprintFormState(false);
-          setIsEditing(false);
-        }}
+          selectedSprint={isEditing ? selectedSprint : null}
+          onSprintAdded={handleSprintAdded}
+          fetchSprints={fetchSprints}
+          onClose={() => {
+            setShowSprintDetails(false);
+            setShowSprintForm(false);
+            setIsEditing(false);
+          }}
         />
       )}
+
       {showTaskForm && (
         <TaskForm
           selectedTask={isEditing ? selectedTask : null}
           onTaskAdded={handleTaskAdded}
           fetchTasks={fetchTasks}
           onClose={() => {
-          setShowTaskDetails(false);
-          setShowTaskFormState(false);
-          setIsEditing(false);
+            setShowTaskDetails(false);
+            setShowTaskForm(false);
+            setIsEditing(false);
           }}
         />
       )}

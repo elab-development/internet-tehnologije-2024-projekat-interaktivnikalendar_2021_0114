@@ -7,7 +7,7 @@ export const fetchSprints = async () => {
   const response = await axios.get(`${API_BASE_URL}/user/sprints`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return response.data;
+  return [response.data];
 };
 
 export const fetchTasks = async () => {
@@ -45,4 +45,3 @@ export const deleteTask = async (taskId) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
-
