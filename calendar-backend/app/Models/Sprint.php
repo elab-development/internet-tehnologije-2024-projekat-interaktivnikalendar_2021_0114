@@ -18,7 +18,7 @@ class Sprint extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'teams')->using(Team::class);
     }
 
     public function tasks()

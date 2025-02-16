@@ -24,7 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'roles_id',
-        'sprint_id'
+        // 'sprint_id'
     ];
 
     /**
@@ -63,5 +63,10 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'roles_id');
+    }
+
+    public function sprints()
+    {
+        return $this->belongsToMany(Sprint::class, 'teams')->using(Team::class);
     }
 }
