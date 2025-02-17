@@ -48,6 +48,15 @@
     border-bottom: none;
 }
 
+.user-role {
+    font-size: 0.8rem;
+    color: var(--dark-grey);
+    background-color: var(--grey);
+    width: fit-content;
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+}
+
 .assign-icon {
     font-size: 1.4rem;
     cursor: pointer;

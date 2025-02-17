@@ -41,16 +41,16 @@ class TaskController extends Controller
             'sprint_id' => 'required|exists:sprints,id',
             'color' => 'required|string',
         ]);
-        
-    $sprint = Sprint::find($validatedData['sprint_id']);
-    if (!$sprint) {
-        return response()->json(['message' => 'Sprint not found'], 404);
-    }
 
-    // Check if the task's start and end dates are within the sprint's start and end dates
-    if ($validatedData['start'] < $sprint->start || $validatedData['end'] > $sprint->end) {
-        return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
-    }
+        $sprint = Sprint::find($validatedData['sprint_id']);
+        if (!$sprint) {
+            return response()->json(['message' => 'Sprint not found'], 404);
+        }
+
+        // Check if the task's start and end dates are within the sprint's start and end dates
+        if ($validatedData['start'] < $sprint->start || $validatedData['end'] > $sprint->end) {
+            return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
+        }
 
         $task = Task::create($validatedData);
 
@@ -100,14 +100,14 @@ class TaskController extends Controller
             'color' => 'required|string',
         ]);
 
-            $sprint = Sprint::find($validatedData['sprint_id']);
+        $sprint = Sprint::find($validatedData['sprint_id']);
         if (!$sprint) {
-                 return response()->json(['message' => 'Sprint not found'], 404);
-            }
+            return response()->json(['message' => 'Sprint not found'], 404);
+        }
 
-    // Check if the task's start and end dates are within the sprint's start and end dates
+        // Check if the task's start and end dates are within the sprint's start and end dates
         if ($validatedData['start'] < $sprint->start || $validatedData['end'] > $sprint->end) {
-                return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
+            return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
         }
 
         $task->update([
@@ -120,7 +120,7 @@ class TaskController extends Controller
             'sprint_id' => $validatedData['sprint_id'],
             'color' => $validatedData['color'],
         ]);
-        
+
 
         return response()->json(['message' => 'Task updated successfully.', 'task' => $task], 200);
     }

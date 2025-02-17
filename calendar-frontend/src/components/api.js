@@ -48,3 +48,31 @@ export const deleteTask = async (taskId) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const assignUserToSprint = async (sprint_id) => {
+  const user_id = prompt("Enter the user ID to assign to the sprint:");
+
+  try {
+    const token = localStorage.getItem("token");
+    await axios.post(
+      `${API_BASE_URL}/assign/${sprint_id}/${user_id}`,
+      {}, // Empty body (since the parameters are in the URL)
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  } catch (error) {
+    console.error("Error: " + error.message);
+  }
+};
+
+export const removeUserFromSprint = async (sprint_id, user_id) => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(`${API_BASE_URL}/assign/${sprint_id}/${user_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error("Error: " + error.message);
+  }
+};

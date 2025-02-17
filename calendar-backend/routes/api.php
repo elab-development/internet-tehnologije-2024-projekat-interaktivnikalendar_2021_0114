@@ -36,6 +36,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Scrum master and product owner routes
     Route::group(['middleware' => ['auth:scrum-master,product-owner']], function () {
         Route::get('sprints/{id}', [SprintController::class, 'show'])->name('sprints.show');
+        Route::post('/assign/{sprint_id}/{user_id}', [SprintController::class, 'assignUserToSprint'])->name('sprint.assignUser');
+        Route::delete('/assign/{sprint_id}/{user_id}', [SprintController::class, 'removeUserFromSprint'])->name('sprint.removeUser');
     });
 
     // Logout route

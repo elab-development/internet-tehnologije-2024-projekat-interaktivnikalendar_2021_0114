@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Sprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,7 @@ class SprintController extends Controller
      */
     public function index()
     {
-        $sprints = Sprint::all();
+        $sprints = Sprint::with('users.role')->get(); // Include user roles
         return response()->json($sprints);
     }
 
@@ -114,7 +115,49 @@ class SprintController extends Controller
     public function userSprints(Request $request)
     {
         $user = $request->user();
-        $sprints = $user->sprints()->with('users')->get();
+        $sprints = $user->sprints()->with('users.role')->get(); // Include user roles
         return response()->json($sprints);
+    }
+
+    public function assignUserToSprint($sprint_id, $user_id)
+    {
+        $sprint = Sprint::find($sprint_id);
+        if (!$sprint) {
+            return response()->json(['error' => 'Sprint not found.'], 404);
+        }
+
+        // Check if user exists before attaching
+        $user = User::find($user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        // Attach user to sprint if not already attached
+        if (!$sprint->users()->where('user_id', $user_id)->exists()) {
+            $sprint->users()->attach($user_id);
+            return response()->json(['message' => 'User assigned to sprint successfully.']);
+        }
+
+        return response()->json(['message' => 'User is already assigned to this sprint.'], 200);
+    }
+
+    public function removeUserFromSprint($sprint_id, $user_id)
+    {
+        $sprint = Sprint::find($sprint_id);
+        if (!$sprint) {
+            return response()->json(['error' => 'Sprint not found.'], 404);
+        }
+
+        $user = User::find($user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        if ($sprint->users()->where('user_id', $user_id)->exists()) {
+            $sprint->users()->detach($user_id);
+            return response()->json(['message' => 'User removed from sprint successfully.']);
+        }
+
+        return response()->json(['message' => 'User is not in this sprint.'], 200);
     }
 }
