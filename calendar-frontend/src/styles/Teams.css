@@ -1,0 +1,70 @@
+.teams-page {
+    width: 100%;
+    margin: 5rem 4rem;
+    /* margin-top: 1rem; */
+}
+
+.teams-page>p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--dark-grey);
+}
+
+.sprints-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.2rem;
+}
+
+.sprint {
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.sprint-header {
+    background-color: var(--sprint-color);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+.users {
+    padding: 1rem;
+}
+
+.user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.user:last-child {
+    border-bottom: none;
+}
+
+.assign-icon {
+    font-size: 1.4rem;
+    cursor: pointer;
+    fill: var(--dark-grey);
+}
+
+.assign-icon:hover {
+    fill: black;
+}
+
+.remove-user-btn {
+    border-radius: 0.1rem;
+    text-decoration: underline;
+    margin-top: 0;
+}
+
+.remove-user-btn:hover {
+    color: var(--red);
+    background-color: #FBE4E4;
+}

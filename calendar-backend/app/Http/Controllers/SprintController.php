@@ -114,7 +114,7 @@ class SprintController extends Controller
     public function userSprints(Request $request)
     {
         $user = $request->user();
-        $sprints = $user->sprints()->get();
+        $sprints = $user->sprints()->with('users')->get();
         return response()->json($sprints);
     }
 }

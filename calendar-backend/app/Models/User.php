@@ -50,11 +50,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function sprint()
-    {
-        return $this->belongsTo(Sprint::class);
-    }
-
     public function tasks()
     {
         return $this->hasMany(Task::class);
@@ -67,6 +62,6 @@ class User extends Authenticatable
 
     public function sprints()
     {
-        return $this->belongsToMany(Sprint::class, 'teams')->using(Team::class);
+        return $this->belongsToMany(Sprint::class, 'teams')->as('team')->using(Team::class);
     }
 }
