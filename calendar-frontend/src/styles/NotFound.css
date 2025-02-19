@@ -1,0 +1,40 @@
+.not-found-page {
+    background-color: var(--grey-v2);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+#er404 {
+    font-size: 18rem;
+    font-weight: 700;
+    color: rgba(95, 94, 91, 0.2);
+    transform: rotate(-15deg);
+    position: absolute;
+    z-index: -1;
+}
+
+.nf-text {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--dark-grey);
+    display: flex;
+    flex-direction: column;
+}
+
+.not-found-page button {
+    margin-top: 0;
+    padding: 0;
+    background-color: transparent;
+    text-decoration: underline;
+    color: #5da9e9ff;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+}
