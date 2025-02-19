@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import "../styles/Teams.css";
-import { fetchSprints } from "../components/api";
+import {
+  assignUserToSprint,
+  fetchSprints,
+  removeUserFromSprint,
+} from "../components/api";
 import { FaRegPlusSquare } from "react-icons/fa";
 
 const Teams = () => {
   const [sprints, setSprints] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const getSprints = () => {
       fetchSprints().then((data) => setSprints(data));
     };
     getSprints();
-  }, []);
+  }, [refresh]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -30,16 +35,28 @@ const Teams = () => {
             >
               <div className="sprint-header">
                 <span>Sprint: {sprint.name}</span>
-                <FaRegPlusSquare className="assign-icon" />
+                <FaRegPlusSquare
+                  className="assign-icon"
+                  onClick={() => {
+                    assignUserToSprint(sprint.id);
+                    setRefresh((prev) => !prev);
+                  }}
+                />
               </div>
               <div className="users">
                 {sprint.users &&
                   sprint.users.map((user) => (
                     <div key={user.id} className="user">
-                      <span>{user.name}</span>
+                      <div>
+                        <span>{user.name}</span>
+                        <p className="user-role">{user.role.name}</p>
+                      </div>
                       <button
                         className="remove-user-btn"
-                        // onClick={() => removeUserFromSprint(sprint.id, user.id)}
+                        onClick={() => {
+                          removeUserFromSprint(sprint.id, user.id);
+                          setRefresh((prev) => !prev);
+                        }}
                       >
                         Remove
                       </button>
