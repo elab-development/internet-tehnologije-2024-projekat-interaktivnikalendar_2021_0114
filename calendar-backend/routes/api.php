@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\SprintController;
-use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\NewPasswordController;  
 
 // Get the authenticated user
 Route::get('/user', function (Request $request) {
@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 // Authentication routes
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');
+
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
