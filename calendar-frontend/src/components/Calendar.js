@@ -138,6 +138,7 @@ const Calendar = () => {
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
         if (!task || !task.name || !task.start || !task.end) {
+          console.log("Processing task:", task);
           console.error("Invalid task data:", task);
           return null;
         }

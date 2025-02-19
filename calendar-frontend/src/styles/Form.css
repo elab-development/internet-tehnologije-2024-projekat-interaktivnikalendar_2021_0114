@@ -16,7 +16,7 @@
 /* Modalni prozor */
 .modal-content {
   background: white;
-  padding: 30px;
+  padding: 2rem;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
   width: 400px;
@@ -24,13 +24,15 @@
 }
 
 /* Stilizacija input polja */
-.modal-content input {
+.modal-content input,
+.modal-content select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 16px;
   margin-bottom: 10px;
+  box-sizing: border-box;
 }
 
 /* Stilizacija dugmadi */

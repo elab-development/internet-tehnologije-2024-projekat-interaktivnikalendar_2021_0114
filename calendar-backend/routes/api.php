@@ -20,6 +20,7 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Task routes
+    Route::get('tasks/assign-sprint', [TaskController::class, 'assignTaskToSprint'])->name('task.assignSprint');
     Route::resource('tasks', TaskController::class);
 
     // Sprints associated with the logged-in user
