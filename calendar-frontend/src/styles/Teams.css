@@ -77,3 +77,46 @@
     color: var(--red);
     background-color: #FBE4E4;
 }
+
+.archived-teams-toggle {
+    margin-top: 1rem;
+    padding: 0.2rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: max-height 0.5s ease-out;
+}
+
+.archived-teams-toggle:hover {
+    background-color: var(--grey-v2);
+    border-radius: 4px;
+}
+
+.archived-teams-toggle svg {
+    margin-right: 0.2rem;
+}
+
+.archive-btn {
+    text-decoration: underline;
+    margin-top: -1rem;
+    padding-right: 1.7rem;
+    padding-bottom: 1rem;
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--red);
+}
+
+.archive-btn span {
+    cursor: pointer;
+    color: var(--red);
+}
+
+.restore-btn {
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.restore-btn:hover {
+    color: var(--grey-v2);
+}

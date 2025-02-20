@@ -11,5 +11,6 @@ class Team extends Pivot
     protected $fillable = [
         'sprint_id',
         'user_id',
+        'is_active',
     ];
 }
