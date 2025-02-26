@@ -42,8 +42,7 @@ class SprintController extends Controller
 
         // Assign the sprint to the logged-in user
         $user = $request->user();
-        $user->sprint_id = $sprint->id;
-        $user->save();
+        $sprint->users()->attach($user->id);
 
         return response()->json(['Sprint created successfully.', $sprint]);
     }

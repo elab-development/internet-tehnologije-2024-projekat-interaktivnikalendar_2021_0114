@@ -23,7 +23,6 @@ export const fetchHolidays = async (apiKey, country, year) => {
     year + 2
   }-12-31`;
   const response = await axios.get(url);
-  console.log(response.data);
   return response.data.map((holiday) => ({
     id: `holiday-${holiday.startDate}`,
     title: holiday.name[0].text,
@@ -33,6 +32,22 @@ export const fetchHolidays = async (apiKey, country, year) => {
     borderColor: "red",
     extendedProps: { type: "holiday" },
   }));
+};
+
+export const fetchActiveTeams = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/user/active-teams`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const fetchArchivedTeams = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/user/archived-teams`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
 };
 
 export const deleteSprint = async (sprintId) => {
@@ -75,4 +90,26 @@ export const removeUserFromSprint = async (sprint_id, user_id) => {
   } catch (error) {
     console.error("Error: " + error.message);
   }
+};
+
+export const assignTaskToSprint = async () => {
+  console.log("Fetching Sprints api.js");
+
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/tasks/assign-sprint`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log("Fetching Sprints for Tasks:", response.data);
+  return response.data;
+};
+
+export const updateTeamStatus = async (sprint_id, status) => {
+  const token = localStorage.getItem("token");
+  await axios.put(
+    `${API_BASE_URL}/user/teams/${sprint_id}/status/${status}`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };

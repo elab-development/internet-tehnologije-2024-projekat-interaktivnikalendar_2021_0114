@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Ramsey\Uuid\Type\Integer;
 
 class UserController extends Controller
 {
@@ -72,5 +74,28 @@ class UserController extends Controller
 
         $user->delete();
         return response()->json('User deleted successfully', 204);
+    }
+
+    public function activeTeams(Request $request)
+    {
+        $user = $request->user();
+        $activeTeams = $user->sprints()->with('users.role')->wherePivot('is_active', true)->get();
+        return response()->json($activeTeams);
+    }
+
+    public function archivedTeams(Request $request)
+    {
+        $user = $request->user();
+        $activeTeams = $user->sprints()->with('users.role')->wherePivot('is_active', false)->get();
+        return response()->json($activeTeams);
+    }
+
+    public function updateTeamStatus(Request $request, $sprint_id, $status)
+    {
+        $user = $request->user();
+        // Convert the status to a boolean value
+        $status = filter_var($status, FILTER_VALIDATE_BOOLEAN);
+        $user->sprints()->updateExistingPivot($sprint_id, ['is_active' =>  $status]);
+        return response()->json(['message' => 'Status updated successfully']);
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\Auth\NewPasswordController;  
 
@@ -21,10 +22,14 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Task routes
+    Route::get('tasks/assign-sprint', [TaskController::class, 'assignTaskToSprint'])->name('task.assignSprint');
     Route::resource('tasks', TaskController::class);
 
     // Sprints associated with the logged-in user
     Route::get('user/sprints', [SprintController::class, 'userSprints'])->name('user.sprints');
+    Route::get('/user/active-teams', [UserController::class, 'activeTeams']);
+    Route::get('/user/archived-teams', [UserController::class, 'archivedTeams']);
+    Route::put('/user/teams/{sprint_id}/status/{status}', [UserController::class, 'updateTeamStatus']);
 
     // Scrum master routes
     Route::group(['middleware' => ['auth:scrum-master']], function () {

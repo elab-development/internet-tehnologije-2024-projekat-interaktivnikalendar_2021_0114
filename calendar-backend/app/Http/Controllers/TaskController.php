@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\TaskResource;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use App\Models\Sprint;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Resources\TaskResource;
 
 class TaskController extends Controller
 {
@@ -133,5 +134,12 @@ class TaskController extends Controller
         $task = Task::find($task_id);
         $task->delete();
         return response()->json('Task deleted successfully.');
+    }
+
+    public function assignTaskToSprint(Request $request)
+    {
+        $user = $request->user();
+        $sprints = $user->sprints()->with('users')->get();
+        return response()->json($sprints);
     }
 }

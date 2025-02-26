@@ -9,6 +9,7 @@ import TaskForm from "./TaskForm";
 import "../styles/Calendar.css";
 import SprintModal from "./SprintModal";
 import TaskModal from "./TaskModal";
+import { AiFillPlusCircle } from "react-icons/ai";
 import {
   formatDateForSprint,
   formatDateTimeForTask,
@@ -138,6 +139,7 @@ const Calendar = () => {
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
         if (!task || !task.name || !task.start || !task.end) {
+          console.log("Processing task:", task);
           console.error("Invalid task data:", task);
           return null;
         }
@@ -274,6 +276,9 @@ const Calendar = () => {
         eventClick={handleEventClick}
         eventDrop={handleEventDrop}
       />
+      <div className="add-event-btn-container">
+        <AiFillPlusCircle className="add-event-btn" />
+      </div>
 
       {showSprintDetails && selectedSprint && (
         <SprintModal

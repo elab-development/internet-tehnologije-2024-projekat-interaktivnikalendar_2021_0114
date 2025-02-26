@@ -62,6 +62,6 @@ class User extends Authenticatable
 
     public function sprints()
     {
-        return $this->belongsToMany(Sprint::class, 'teams')->as('team')->using(Team::class);
+        return $this->belongsToMany(Sprint::class, 'teams')->as('team')->using(Team::class)->withPivot('is_active');
     }
 }

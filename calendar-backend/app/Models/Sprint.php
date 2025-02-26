@@ -19,7 +19,7 @@ class Sprint extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'teams')->using(Team::class);
+        return $this->belongsToMany(User::class, 'teams')->using(Team::class)->withPivot('is_active');
     }
 
     public function tasks()

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Form.css";
+import { assignTaskToSprint } from "./api";
 
 const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
   const [formData, setFormData] = useState({
@@ -14,11 +15,36 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     color: "#90EE90", // Default color light green
   });
 
+  const [availableSprints, setAvailableSprints] = useState([]);
+  const [selectedSprint, setSelectedSprint] = useState(null);
+
+  const fetchAvailableSprints = async () => {
+    try {
+      console.log("Fetching available sprints...");
+      const [sprintsData] = await Promise.all([assignTaskToSprint()]);
+      setAvailableSprints(sprintsData);
+    } catch (error) {
+      alert("Failed to fetch available sprints");
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
   };
+
+  useEffect(() => {
+    fetchAvailableSprints();
+  }, []);
+
+  // Set selectedSprint to the first sprint in availableSprints
+  // TODO: FIND ANOTHER WAY TO IMPLEMENT THIS
+  useEffect(() => {
+    if (!selectedSprint && availableSprints.length > 0) {
+      setSelectedSprint(availableSprints[0]);
+    }
+  }, [availableSprints]);
 
   useEffect(() => {
     if (selectedTask) {
@@ -89,8 +115,9 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
           fetchTasks();
           onClose();
         })
-        .catch(() => alert("Failed to add task"));
-      console.log(formData);
+        .catch((er) => {
+          alert("Failed to add task: " + er.response.data.message);
+        });
     }
   };
 
@@ -109,6 +136,7 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               required
             />
           </div>
+
           <div>
             <label>Description:</label>
             <input
@@ -118,6 +146,7 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               onChange={handleInputChange}
             />
           </div>
+
           <div>
             <label>Start Date & Time:</label>
             <input
@@ -128,6 +157,7 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               required
             />
           </div>
+
           <div>
             <label>End Date & Time:</label>
             <input
@@ -138,6 +168,7 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               required
             />
           </div>
+
           <div>
             <label>Status:</label>
             <input
@@ -148,26 +179,56 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               required
             />
           </div>
-          <div>
-            <label>User:</label>
-            <input
-              type="text"
-              name="user_id"
-              value={formData.user_id}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+
           <div>
             <label>Sprint:</label>
-            <input
-              type="text"
+            <select
               name="sprint_id"
-              value={formData.sprint_id}
               onChange={handleInputChange}
+              onBlur={() =>
+                setSelectedSprint(
+                  availableSprints.find(
+                    (sprint) => sprint.id == formData.sprint_id
+                  )
+                )
+              }
+              value={formData.sprint_id} // Previously selected sprint when editing
               required
-            />
+            >
+              {(Array.isArray(availableSprints) ? availableSprints : []).map(
+                (sprint) => {
+                  return (
+                    <option key={sprint.id} value={sprint.id}>
+                      {sprint.name}
+                    </option>
+                  );
+                }
+              )}
+            </select>
           </div>
+
+          <div>
+            <label>User:</label>
+            <select
+              name="user_id"
+              onChange={handleInputChange}
+              value={formData.user_id} // Previously selected user when editing
+              required
+            >
+              {selectedSprint &&
+                (Array.isArray(selectedSprint.users)
+                  ? selectedSprint.users
+                  : []
+                ).map((user) => {
+                  return (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  );
+                })}
+            </select>
+          </div>
+
           <div className="form-color">
             <label>Color:</label>
             <input
