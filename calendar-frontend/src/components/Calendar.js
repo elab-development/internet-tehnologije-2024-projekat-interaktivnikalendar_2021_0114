@@ -22,6 +22,7 @@ import {
   deleteSprint,
   deleteTask,
 } from "./api";
+import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
 
 const Calendar = () => {
   const [tasks, setTasks] = useState([]);
@@ -115,7 +116,7 @@ const Calendar = () => {
   };
 
   const prepareSprintEvents = (sprints) => {
-    console.log("Prepare Sprints:");
+    console.log("Sprints:", sprints);
     return (Array.isArray(sprints) ? sprints : [])
       .map((sprint) => {
         if (!sprint || !sprint.name || !sprint.start || !sprint.end) {
@@ -279,6 +280,10 @@ const Calendar = () => {
       <div className="add-event-btn-container">
         <AiFillPlusCircle className="add-event-btn" />
       </div>
+
+      
+      <button onClick={() => downloadTasksIcsFile(tasks)}>Download Tasks as .ics</button>
+      <button onClick={() => downloadSprintsIcsFile(sprints)}>Download Sprints as .ics</button>
 
       {showSprintDetails && selectedSprint && (
         <SprintModal
