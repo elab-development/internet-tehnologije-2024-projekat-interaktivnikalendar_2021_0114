@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -35,6 +35,8 @@ const Calendar = () => {
   const [selectedSprint, setSelectedSprint] = useState(null);
   const [showSprintDetails, setShowSprintDetails] = useState(false);
 
+  const [showAddMenu, setShowAddMenu] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
@@ -44,6 +46,9 @@ const Calendar = () => {
   const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
   const country = "RS";
   const year = 2025;
+
+  const addMenuRef = useRef(null);
+  const addEventBtnRef = useRef(null);
 
   const fetchData = async () => {
     try {
@@ -64,6 +69,24 @@ const Calendar = () => {
   useEffect(() => {
     fetchData();
   }, [refresh]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        addMenuRef.current &&
+        !addMenuRef.current.contains(event.target) &&
+        addEventBtnRef.current &&
+        !addEventBtnRef.current.contains(event.target)
+      ) {
+        setShowAddMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ------ Sprint handling ------
   const handleSprintAdded = (newSprint) => {
@@ -255,20 +278,6 @@ const Calendar = () => {
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
-        footerToolbar={{
-          left: "createSprintButton",
-          right: "createTaskButton",
-        }}
-        customButtons={{
-          createSprintButton: {
-            text: "Create Sprint",
-            click: () => setShowSprintForm(true),
-          },
-          createTaskButton: {
-            text: "Create Task",
-            click: () => setShowTaskForm(true),
-          },
-        }}
         events={events}
         editable={true}
         selectable={true}
@@ -277,13 +286,15 @@ const Calendar = () => {
         eventClick={handleEventClick}
         eventDrop={handleEventDrop}
       />
-      <div className="add-event-btn-container">
-        <AiFillPlusCircle className="add-event-btn" />
+      <div
+        className="add-event-btn-container"
+        onClick={() => setShowAddMenu(!showAddMenu)}
+        ref={addEventBtnRef}
+      >
+        <AiFillPlusCircle
+          className={`add-event-btn ${showAddMenu ? "close-menu-btn" : ""}`}
+        />
       </div>
-
-      
-      <button onClick={() => downloadTasksIcsFile(tasks)}>Download Tasks as .ics</button>
-      <button onClick={() => downloadSprintsIcsFile(sprints)}>Download Sprints as .ics</button>
 
       {showSprintDetails && selectedSprint && (
         <SprintModal
@@ -301,6 +312,19 @@ const Calendar = () => {
           onDelete={handleDeleteTask}
           onClose={() => setShowTaskDetails(false)}
         />
+      )}
+
+      {showAddMenu && (
+        <div className="add-event-menu" ref={addMenuRef}>
+          <ul>
+            <li onClick={() => setShowSprintForm(true)}>Create Sprint</li>
+            <li onClick={() => setShowTaskForm(true)}>Create Task</li>
+            <li onClick={() => downloadTasksIcsFile(tasks)}>Export Tasks</li>
+            <li onClick={() => downloadSprintsIcsFile(sprints)}>
+              Export Sprints
+            </li>
+          </ul>
+        </div>
       )}
 
       {showSprintForm && (
