@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import InvitationForm from "../components/InvitationForm";
 import "../styles/Teams.css";
 import {
-  assignUserToSprint,
   fetchActiveTeams,
   fetchArchivedTeams,
   removeUserFromSprint,
@@ -10,12 +10,16 @@ import {
 } from "../components/api";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
+import { useLocation } from "react-router-dom";
 
 const Teams = () => {
   const [sprints, setSprints] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showArchivedTeams, setShowArchivedTeams] = useState(false);
   const [archivedSprints, setArchivedSprints] = useState([]);
+  const [selectedSprintId, setSelectedSprintId] = useState(null);
+
+  const location = useLocation();
 
   const updateArchivedTeams = () => {
     fetchArchivedTeams().then((data) => {
@@ -30,12 +34,20 @@ const Teams = () => {
     });
   };
 
+  const refreshSprints = () => {
+    fetchActiveTeams().then((data) => setSprints(data));
+  };
+
   useEffect(() => {
-    const getTeams = () => {
-      fetchActiveTeams().then((data) => setSprints(data));
-    };
-    getTeams();
-  }, [refresh]);
+    refreshSprints();
+
+    const params = new URLSearchParams(location.search);
+    if (params.get("joined") === "true") {
+      alert("Successfully joined the team!");
+      setRefresh((prev) => !prev);
+  
+    }
+  }, [refresh, location.search]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -55,10 +67,7 @@ const Teams = () => {
                 <span>Sprint: {sprint.name}</span>
                 <FaRegPlusSquare
                   className="assign-icon"
-                  onClick={() => {
-                    assignUserToSprint(sprint.id);
-                    setRefresh((prev) => !prev);
-                  }}
+                  onClick={() => setSelectedSprintId(sprint.id)}
                 />
               </div>
               <div className="users">
@@ -138,6 +147,14 @@ const Teams = () => {
             </div>
           )}
         </div>
+
+        {selectedSprintId && (
+          <InvitationForm
+            selectedSprintId={selectedSprintId}
+            onClose={() => setSelectedSprintId(null)}
+            onSuccess={refreshSprints}
+          />
+        )}
       </div>
     </div>
   );

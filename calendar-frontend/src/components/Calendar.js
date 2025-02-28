@@ -131,6 +131,7 @@ const Calendar = () => {
           backgroundColor: sprint.color,
           borderColor: sprint.color,
           extendedProps: { type: "sprint" },
+          
         };
       })
       .filter((event) => event !== null);

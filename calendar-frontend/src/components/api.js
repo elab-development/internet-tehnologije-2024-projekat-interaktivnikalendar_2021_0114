@@ -113,3 +113,11 @@ export const updateTeamStatus = async (sprint_id, status) => {
     }
   );
 };
+
+export const sendInvitation = async (data) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`${API_BASE_URL}/invitations`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
