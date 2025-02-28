@@ -24,7 +24,7 @@ import {
 } from "./api";
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
 
-const Calendar = () => {
+const Calendar = ({ selectedDate }) => {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -49,6 +49,7 @@ const Calendar = () => {
 
   const addMenuRef = useRef(null);
   const addEventBtnRef = useRef(null);
+  const calendarRef = useRef(null);
 
   const fetchData = async () => {
     try {
@@ -87,6 +88,40 @@ const Calendar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Goes to date selected in sidebar
+  useEffect(() => {
+    if (selectedDate && calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.gotoDate(selectedDate);
+
+      const formattedDate = convertToLocalDate(selectedDate);
+      const dayEl = calendarApi.el.querySelector(
+        `[data-date="${formattedDate}"]`
+      );
+      const timeEl = calendarApi.el.querySelector(
+        `.fc-timegrid-col[data-date="${formattedDate}"]`
+      );
+      const allDayEl = calendarApi.el.querySelector(
+        `.fc-daygrid-day[data-date="${formattedDate}"]`
+      );
+
+      const highlightElement = (el) => {
+        if (el) {
+          el.style.transition = "background-color 1s ease";
+          el.style.backgroundColor = "var(--red-higlight)";
+          setTimeout(() => {
+            el.style.transition = "background-color 2s ease";
+            el.style.backgroundColor = "var(--white)";
+          }, 1000);
+        }
+      };
+
+      highlightElement(dayEl);
+      highlightElement(timeEl);
+      highlightElement(allDayEl);
+    }
+  }, [selectedDate]);
 
   // ------ Sprint handling ------
   const handleSprintAdded = (newSprint) => {
@@ -285,6 +320,7 @@ const Calendar = () => {
         firstDay={1}
         eventClick={handleEventClick}
         eventDrop={handleEventDrop}
+        ref={calendarRef}
       />
       <div
         className="add-event-btn-container"

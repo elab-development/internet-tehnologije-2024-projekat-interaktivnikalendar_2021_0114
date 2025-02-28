@@ -10,6 +10,7 @@
   --dark-grey: rgb(95, 94, 91);
   --white: #ffffff;
   --red: #CC3E28;
+  --red-higlight: #FBE4E4;
 }
 
 body {
@@ -22,4 +23,3 @@ body {
   margin: 0;
   font-family: 'Prompt', sans-serif;
 }
-
