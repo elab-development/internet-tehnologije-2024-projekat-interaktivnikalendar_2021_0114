@@ -4,10 +4,12 @@ import Sidebar from "../components/Sidebar";
 import "../styles/Form.css";
 
 const Dashboard = () => {
+  const [selectedDate, setSelectedDate] = useState(null);
+
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar />
-      <Calendar />
+      <Sidebar setSelectedDate={setSelectedDate} />
+      <Calendar selectedDate={selectedDate} />
     </div>
   );
 };

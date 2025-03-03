@@ -4,15 +4,23 @@ import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Sidebar = ({ children }) => {
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+
+const Sidebar = ({ children, setSelectedDate }) => {
   const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
+  const country = "RS";
+  const year = 2025;
 
   const toggleTasksCollapse = () => {
     setIsTasksCollapsed(!isTasksCollapsed);
@@ -44,7 +52,26 @@ const Sidebar = ({ children }) => {
   return (
     <div className="sidebar-wrapper">
       <div className="sidebar-container">
-        <div className="small-calendar">{/* Add small calendar later */}</div>
+        <div className="small-calendar">
+          <FullCalendar
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            headerToolbar={{
+              right: "prev,next today",
+              left: "title",
+            }}
+            selectable={true}
+            firstDay={1}
+            dayCellClassNames={() => "custom-day-cell"} // Add custom class to day cells
+            dayHeaderContent={(args) => {
+              const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+              return dayNames[args.date.getUTCDay()];
+            }}
+            titleFormat={{ month: "short", year: "numeric" }}
+            dateClick={(info) => setSelectedDate(info.date)}
+            contentHeight={"auto"}
+          />
+        </div>
 
         <div className="sidebar-sections">
           <div>
