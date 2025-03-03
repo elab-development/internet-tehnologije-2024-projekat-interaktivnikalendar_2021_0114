@@ -43,7 +43,6 @@ const Calendar = ({ selectedDate }) => {
 
   const [holidays, setHolidays] = useState([]);
 
-  const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
   const country = "RS";
   const year = 2025;
 
@@ -51,24 +50,33 @@ const Calendar = ({ selectedDate }) => {
   const addEventBtnRef = useRef(null);
   const calendarRef = useRef(null);
 
-  const fetchData = async () => {
-    try {
-      console.log("Fetching data...");
-      const [sprintsData, tasksData, holidaysData] = await Promise.all([
-        fetchSprints(),
-        fetchTasks(),
-        fetchHolidays(apiKey, country, year),
-      ]);
-      setSprints(sprintsData);
-      setTasks(tasksData);
-      setHolidays(holidaysData);
-    } catch (error) {
-      alert("Failed to fetch data");
-    }
-  };
-
   useEffect(() => {
+    let active = true;
+
+    const fetchData = async () => {
+      try {
+        console.log("Fetching data...");
+        const [sprintsData, tasksData, holidaysData] = await Promise.all([
+          fetchSprints(),
+          fetchTasks(),
+          fetchHolidays(country, year),
+        ]);
+        if (active) {
+          setSprints(sprintsData);
+          setTasks(tasksData);
+          setHolidays(holidaysData);
+        }
+      } catch (error) {
+        if (active) {
+          alert("Failed to fetch data");
+        }
+      }
+    };
+
     fetchData();
+    return () => {
+      active = false;
+    };
   }, [refresh]);
 
   useEffect(() => {
@@ -121,6 +129,10 @@ const Calendar = ({ selectedDate }) => {
       highlightElement(timeEl);
       highlightElement(allDayEl);
     }
+
+    return () => {
+      // Cleanup logic if needed
+    };
   }, [selectedDate]);
 
   // ------ Sprint handling ------
@@ -189,7 +201,6 @@ const Calendar = ({ selectedDate }) => {
           backgroundColor: sprint.color,
           borderColor: sprint.color,
           extendedProps: { type: "sprint" },
-          
         };
       })
       .filter((event) => event !== null);

@@ -22,16 +22,28 @@ const Teams = () => {
   const location = useLocation();
 
   const updateArchivedTeams = () => {
+    let active = true;
     fetchArchivedTeams().then((data) => {
-      setArchivedSprints(data);
+      if (active) setArchivedSprints(data);
     });
+
+    return () => {
+      active = false;
+    };
   };
 
   const toggleDropdown = () => {
+    let active = true;
     fetchArchivedTeams().then((data) => {
-      setArchivedSprints(data);
-      setShowArchivedTeams((prev) => !prev);
+      if (active) {
+        setArchivedSprints(data);
+        setShowArchivedTeams((prev) => !prev);
+      }
     });
+
+    return () => {
+      active = false;
+    };
   };
 
   const refreshSprints = () => {
@@ -39,14 +51,20 @@ const Teams = () => {
   };
 
   useEffect(() => {
-    refreshSprints();
+    let active = true;
+    fetchActiveTeams().then((data) => {
+      if (active) setSprints(data);
+    });
 
     const params = new URLSearchParams(location.search);
     if (params.get("joined") === "true") {
       alert("Successfully joined the team!");
       setRefresh((prev) => !prev);
-  
     }
+
+    return () => {
+      active = false;
+    };
   }, [refresh, location.search]);
 
   return (
@@ -95,6 +113,7 @@ const Teams = () => {
                   onClick={() => {
                     updateTeamStatus(sprint.id, false);
                     setRefresh((prev) => !prev);
+                    if (showArchivedTeams) updateArchivedTeams();
                   }}
                 >
                   Archive

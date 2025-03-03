@@ -18,7 +18,7 @@ export const fetchTasks = async () => {
   return response.data;
 };
 
-export const fetchHolidays = async (apiKey, country, year) => {
+export const fetchHolidays = async (country, year) => {
   const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=EN&validFrom=${year}-01-01&validTo=${
     year + 2
   }-12-31`;
