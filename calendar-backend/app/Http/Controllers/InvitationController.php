@@ -39,13 +39,16 @@ class InvitationController extends Controller
     {
         $invitation = Invitation::where('token', $token)->firstOrFail();
 
-        $user = User::where('email', $invitation->email)->firstOrFail();
+        $user = User::where('email', $invitation->email)->first();
 
+        if (!$user) {
+            // Redirect to the registration page with email and token as query parameters
+            return redirect("http://localhost:3000/register?email={$invitation->email}&token={$token}");
+        }
         $sprint = Sprint::find($invitation->sprint_id);
         $sprint->users()->attach($user->id);
 
         $invitation->delete();
 
-        //return response()->json(['message' => 'Invitation accepted successfully.']);
         return redirect("http://localhost:3000/teams?sprint_id={$sprint->id}&joined=true");    }
 }
