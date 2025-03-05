@@ -4,10 +4,10 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 import Sidebar from "./components/Sidebar";
 import PrivateRoute from "./components/PrivateRoute";
 import Teams from "./pages/Teams";
+import CalendarPage from "./pages/CalendarPage";
 
 function App() {
   return (
@@ -18,10 +18,10 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route
-            path="dashboard"
+            path="calendar"
             element={
               <PrivateRoute>
-                <Dashboard />
+                <CalendarPage />
               </PrivateRoute>
             }
           />

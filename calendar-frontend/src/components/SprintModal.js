@@ -1,7 +1,7 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
-const SprintModal = ({ sprint, onEdit, onDelete, onClose }) => (
-  <div className="modal-sprint">
+const SprintModal = forwardRef(({ sprint, onEdit, onDelete, onClose }, ref) => (
+  <div className="modal-sprint" ref={ref}>
     <div className="modal-content-sprint">
       <h2>{sprint.title}</h2>
       <p>
@@ -16,6 +16,6 @@ const SprintModal = ({ sprint, onEdit, onDelete, onClose }) => (
       <button onClick={onClose}>Close</button>
     </div>
   </div>
-);
+));
 
 export default SprintModal;

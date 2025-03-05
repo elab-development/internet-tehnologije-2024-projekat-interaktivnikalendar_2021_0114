@@ -75,11 +75,6 @@ const Sidebar = ({ children, setSelectedDate }) => {
 
         <div className="sidebar-sections">
           <div>
-            <NavLink to="/dashboard" className="icon-and-link">
-              <AiOutlineHome className="sidebar-icon" />
-              Home
-            </NavLink>
-
             <NavLink to="/calendar" className="icon-and-link">
               <BsCalendar className="sidebar-icon" />
               Calendar

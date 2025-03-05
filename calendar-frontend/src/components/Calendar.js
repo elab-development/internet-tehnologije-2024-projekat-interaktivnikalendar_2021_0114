@@ -15,15 +15,9 @@ import {
   formatDateTimeForTask,
   convertToLocalDate,
 } from "./utils";
-import {
-  fetchSprints,
-  fetchTasks,
-  fetchHolidays,
-  fetchLoggedInUser,
-  deleteSprint,
-  deleteTask,
-} from "./api";
+import { fetchSprints, fetchTasks,fetchLoggedInUser, deleteSprint, deleteTask } from "./api";
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
+import { useFetchData, useHandleClickOutside } from "../hooks/calendarHooks";
 
 const Calendar = ({ selectedDate }) => {
   const [tasks, setTasks] = useState([]);
@@ -44,31 +38,24 @@ const Calendar = ({ selectedDate }) => {
 
   const [holidays, setHolidays] = useState([]);
 
-  const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
   const country = "RS";
   const year = 2025;
 
   const addMenuRef = useRef(null);
   const addEventBtnRef = useRef(null);
   const calendarRef = useRef(null);
+  const sprintDetailsRef = useRef(null);
+  const taskDetailsRef = useRef(null);
+  const [user,setUser]=useState(null);
 
-  const [user, setUser] = useState(null); 
+  useFetchData(setSprints, setTasks, setHolidays, country, year, refresh);
 
-  const fetchData = async () => {
-    try {
-      console.log("Fetching data...");
-      const [sprintsData, tasksData, holidaysData] = await Promise.all([
-        fetchSprints(),
-        fetchTasks(),
-        fetchHolidays(apiKey, country, year),
-      ]);
-      setSprints(sprintsData);
-      setTasks(tasksData);
-      setHolidays(holidaysData);
-    } catch (error) {
-      alert("Failed to fetch data");
-    }
-  };
+  useHandleClickOutside(addMenuRef, addEventBtnRef, setShowAddMenu);
+  useHandleClickOutside(sprintDetailsRef, null, () =>
+    setShowSprintDetails(false)
+  );
+  useHandleClickOutside(taskDetailsRef, null, () => setShowTaskDetails(false));
+
 
   const fetchUserData = async () => {
      
@@ -82,30 +69,12 @@ const Calendar = ({ selectedDate }) => {
   };
 
   useEffect(() => {
-    fetchData();
+    
     fetchUserData();  
-  }, [refresh]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        addMenuRef.current &&
-        !addMenuRef.current.contains(event.target) &&
-        addEventBtnRef.current &&
-        !addEventBtnRef.current.contains(event.target)
-      ) {
-        setShowAddMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  });
   // Goes to date selected in sidebar
   useEffect(() => {
+
     if (selectedDate && calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.gotoDate(selectedDate);
@@ -136,6 +105,10 @@ const Calendar = ({ selectedDate }) => {
       highlightElement(timeEl);
       highlightElement(allDayEl);
     }
+
+    return () => {
+      // Cleanup logic if needed
+    };
   }, [selectedDate]);
 
   // ------ Sprint handling ------
@@ -204,7 +177,6 @@ const Calendar = ({ selectedDate }) => {
           backgroundColor: sprint.color,
           borderColor: sprint.color,
           extendedProps: { type: "sprint" },
-          
         };
       })
       .filter((event) => event !== null);
@@ -350,6 +322,7 @@ const Calendar = ({ selectedDate }) => {
 
       {showSprintDetails && selectedSprint && (
         <SprintModal
+          ref={sprintDetailsRef}
           sprint={selectedSprint}
           onEdit={handleEditSprint}
           onDelete={handleDeleteSprint}
@@ -359,6 +332,7 @@ const Calendar = ({ selectedDate }) => {
 
       {showTaskDetails && selectedTask && (
         <TaskModal
+          ref={taskDetailsRef}
           task={selectedTask}
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}
