@@ -23,6 +23,7 @@ import {
   deleteTask,
 } from "./api";
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
+import { useFetchData, useHandleClickOutside } from "../hooks/calendarHooks";
 
 const Calendar = ({ selectedDate }) => {
   const [tasks, setTasks] = useState([]);
@@ -49,53 +50,15 @@ const Calendar = ({ selectedDate }) => {
   const addMenuRef = useRef(null);
   const addEventBtnRef = useRef(null);
   const calendarRef = useRef(null);
+  const sprintDetailsRef = useRef(null);
+  const taskDetailsRef = useRef(null);
 
-  useEffect(() => {
-    let active = true;
-
-    const fetchData = async () => {
-      try {
-        console.log("Fetching data...");
-        const [sprintsData, tasksData, holidaysData] = await Promise.all([
-          fetchSprints(),
-          fetchTasks(),
-          fetchHolidays(country, year),
-        ]);
-        if (active) {
-          setSprints(sprintsData);
-          setTasks(tasksData);
-          setHolidays(holidaysData);
-        }
-      } catch (error) {
-        if (active) {
-          alert("Failed to fetch data");
-        }
-      }
-    };
-
-    fetchData();
-    return () => {
-      active = false;
-    };
-  }, [refresh]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        addMenuRef.current &&
-        !addMenuRef.current.contains(event.target) &&
-        addEventBtnRef.current &&
-        !addEventBtnRef.current.contains(event.target)
-      ) {
-        setShowAddMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useFetchData(setSprints, setTasks, setHolidays, country, year, refresh);
+  useHandleClickOutside(addMenuRef, addEventBtnRef, setShowAddMenu);
+  useHandleClickOutside(sprintDetailsRef, null, () =>
+    setShowSprintDetails(false)
+  );
+  useHandleClickOutside(taskDetailsRef, null, () => setShowTaskDetails(false));
 
   // Goes to date selected in sidebar
   useEffect(() => {
@@ -346,6 +309,7 @@ const Calendar = ({ selectedDate }) => {
 
       {showSprintDetails && selectedSprint && (
         <SprintModal
+          ref={sprintDetailsRef}
           sprint={selectedSprint}
           onEdit={handleEditSprint}
           onDelete={handleDeleteSprint}
@@ -355,6 +319,7 @@ const Calendar = ({ selectedDate }) => {
 
       {showTaskDetails && selectedTask && (
         <TaskModal
+          ref={taskDetailsRef}
           task={selectedTask}
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}

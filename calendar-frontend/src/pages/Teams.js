@@ -2,15 +2,11 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import InvitationForm from "../components/InvitationForm";
 import "../styles/Teams.css";
-import {
-  fetchActiveTeams,
-  fetchArchivedTeams,
-  removeUserFromSprint,
-  updateTeamStatus,
-} from "../components/api";
+import { removeUserFromSprint, updateTeamStatus } from "../components/api";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
 import { useLocation } from "react-router-dom";
+import { useFetchActiveTeams, useFetchArchivedTeams } from "../hooks/teamHooks";
 
 const Teams = () => {
   const [sprints, setSprints] = useState([]);
@@ -21,51 +17,20 @@ const Teams = () => {
 
   const location = useLocation();
 
-  const updateArchivedTeams = () => {
-    let active = true;
-    fetchArchivedTeams().then((data) => {
-      if (active) setArchivedSprints(data);
-    });
-
-    return () => {
-      active = false;
-    };
-  };
+  useFetchActiveTeams(setSprints, refresh);
+  useFetchArchivedTeams(setArchivedSprints, showArchivedTeams, refresh);
 
   const toggleDropdown = () => {
-    let active = true;
-    fetchArchivedTeams().then((data) => {
-      if (active) {
-        setArchivedSprints(data);
-        setShowArchivedTeams((prev) => !prev);
-      }
-    });
-
-    return () => {
-      active = false;
-    };
-  };
-
-  const refreshSprints = () => {
-    fetchActiveTeams().then((data) => setSprints(data));
+    setShowArchivedTeams((prev) => !prev);
   };
 
   useEffect(() => {
-    let active = true;
-    fetchActiveTeams().then((data) => {
-      if (active) setSprints(data);
-    });
-
     const params = new URLSearchParams(location.search);
     if (params.get("joined") === "true") {
       alert("Successfully joined the team!");
       setRefresh((prev) => !prev);
     }
-
-    return () => {
-      active = false;
-    };
-  }, [refresh, location.search]);
+  }, [location.search]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -113,7 +78,6 @@ const Teams = () => {
                   onClick={() => {
                     updateTeamStatus(sprint.id, false);
                     setRefresh((prev) => !prev);
-                    if (showArchivedTeams) updateArchivedTeams();
                   }}
                 >
                   Archive
@@ -144,7 +108,6 @@ const Teams = () => {
                       onClick={() => {
                         updateTeamStatus(sprint.id, true);
                         setRefresh((prev) => !prev);
-                        updateArchivedTeams();
                       }}
                     >
                       Restore
@@ -171,7 +134,7 @@ const Teams = () => {
           <InvitationForm
             selectedSprintId={selectedSprintId}
             onClose={() => setSelectedSprintId(null)}
-            onSuccess={refreshSprints}
+            onSuccess={() => setRefresh((prev) => !prev)}
           />
         )}
       </div>

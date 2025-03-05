@@ -1,7 +1,7 @@
-import React from "react";
+import React, { forwardRef } from "react";
 
-const TaskModal = ({ task, onEdit, onDelete, onClose }) => (
-  <div className="modal-task">
+const TaskModal = forwardRef(({ task, onEdit, onDelete, onClose }, ref) => (
+  <div className="modal-task" ref={ref}>
     <div className="modal-content-task">
       <h2>{task.title}</h2>
       <p>
@@ -21,6 +21,6 @@ const TaskModal = ({ task, onEdit, onDelete, onClose }) => (
       <button onClick={onClose}>Close</button>
     </div>
   </div>
-);
+));
 
 export default TaskModal;
