@@ -69,9 +69,9 @@ const Calendar = ({ selectedDate }) => {
   };
 
   useEffect(() => {
-    
     fetchUserData();  
-  });
+  }, []);
+
   // Goes to date selected in sidebar
   useEffect(() => {
 
