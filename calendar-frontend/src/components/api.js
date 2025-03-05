@@ -34,6 +34,14 @@ export const fetchHolidays = async (apiKey, country, year) => {
   }));
 };
 
+export const fetchLoggedInUser = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/user-with-role`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export const fetchActiveTeams = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user/active-teams`, {

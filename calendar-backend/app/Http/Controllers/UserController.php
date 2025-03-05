@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::with('role')->get();
         return response()->json($users);
     }
 
@@ -97,5 +97,11 @@ class UserController extends Controller
         $status = filter_var($status, FILTER_VALIDATE_BOOLEAN);
         $user->sprints()->updateExistingPivot($sprint_id, ['is_active' =>  $status]);
         return response()->json(['message' => 'Status updated successfully']);
+    }
+
+    public function getUserWithRole(Request $request)
+    {
+        $user = $request->user()->load('role');
+        return response()->json($user);
     }
 }

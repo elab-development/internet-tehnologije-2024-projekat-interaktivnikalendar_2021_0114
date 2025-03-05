@@ -13,6 +13,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// Get the authenticated user with role
+Route::get('/user-with-role', [UserController::class, 'getUserWithRole'])->middleware('auth:sanctum');
+
 // Authentication routes
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');

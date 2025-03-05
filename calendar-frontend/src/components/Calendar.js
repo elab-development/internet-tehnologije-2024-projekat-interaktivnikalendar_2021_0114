@@ -19,6 +19,7 @@ import {
   fetchSprints,
   fetchTasks,
   fetchHolidays,
+  fetchLoggedInUser,
   deleteSprint,
   deleteTask,
 } from "./api";
@@ -51,6 +52,8 @@ const Calendar = ({ selectedDate }) => {
   const addEventBtnRef = useRef(null);
   const calendarRef = useRef(null);
 
+  const [user, setUser] = useState(null); 
+
   const fetchData = async () => {
     try {
       console.log("Fetching data...");
@@ -67,8 +70,20 @@ const Calendar = ({ selectedDate }) => {
     }
   };
 
+  const fetchUserData = async () => {
+     
+    try {
+      const userData = await fetchLoggedInUser();
+      setUser(userData);
+    } catch (error) {
+      alert("Failed to fetch user data");
+    }
+
+  };
+
   useEffect(() => {
     fetchData();
+    fetchUserData();  
   }, [refresh]);
 
   useEffect(() => {
@@ -354,7 +369,9 @@ const Calendar = ({ selectedDate }) => {
       {showAddMenu && (
         <div className="add-event-menu" ref={addMenuRef}>
           <ul>
-            <li onClick={() => setShowSprintForm(true)}>Create Sprint</li>
+            {user && user.role.name !== "Developer" && (
+              <li onClick={() => setShowSprintForm(true)}>Create Sprint</li>
+            )}
             <li onClick={() => setShowTaskForm(true)}>Create Task</li>
             <li onClick={() => downloadTasksIcsFile(tasks)}>Export Tasks</li>
             <li onClick={() => downloadSprintsIcsFile(sprints)}>
