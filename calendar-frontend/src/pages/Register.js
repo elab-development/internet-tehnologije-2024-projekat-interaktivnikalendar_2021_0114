@@ -34,7 +34,7 @@ const Register = () => {
         roles_id: roleToId[role],
       });
       localStorage.setItem("token", response.data.access_token);
-      navigate("/dashboard");
+      navigate("/calendar");
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);

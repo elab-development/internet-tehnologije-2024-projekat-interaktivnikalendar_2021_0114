@@ -18,7 +18,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.access_token);
-      navigate("/dashboard");
+      navigate("/calendar");
     } catch (error) {
       setError("Login failed: Invalid email or password");
       setEmail("");
