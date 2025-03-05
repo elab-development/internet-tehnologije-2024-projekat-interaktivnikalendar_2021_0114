@@ -3,7 +3,7 @@ import Calendar from "../components/Calendar";
 import Sidebar from "../components/Sidebar";
 import "../styles/Form.css";
 
-const Dashboard = () => {
+const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   return (
@@ -14,4 +14,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default CalendarPage;

@@ -15,13 +15,7 @@ import {
   formatDateTimeForTask,
   convertToLocalDate,
 } from "./utils";
-import {
-  fetchSprints,
-  fetchTasks,
-  fetchHolidays,
-  deleteSprint,
-  deleteTask,
-} from "./api";
+import { fetchSprints, fetchTasks, deleteSprint, deleteTask } from "./api";
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
 import { useFetchData, useHandleClickOutside } from "../hooks/calendarHooks";
 
@@ -54,6 +48,7 @@ const Calendar = ({ selectedDate }) => {
   const taskDetailsRef = useRef(null);
 
   useFetchData(setSprints, setTasks, setHolidays, country, year, refresh);
+
   useHandleClickOutside(addMenuRef, addEventBtnRef, setShowAddMenu);
   useHandleClickOutside(sprintDetailsRef, null, () =>
     setShowSprintDetails(false)
