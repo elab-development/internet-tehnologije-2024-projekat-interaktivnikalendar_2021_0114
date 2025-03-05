@@ -1,7 +1,14 @@
 import axios from "axios";
-import { fetchSprints } from "../components/api";
+import { fetchSprints, deleteSprint } from "../components/api";
 
 // Mock axios
+/*
+Ovo koristi vi.mock funkcionalnost iz Vitest biblioteke za mock-ovanje
+ (lažno pozivanje) axios modula. 
+ To znači da će se svi pozivi na axios tokom testiranja 
+ umesto da idu prema stvarnom API-ju,
+  pozivati fake implementacije koje vraćaju zadate vrednosti.
+*/
 vi.mock("axios");
 
 describe("fetchSprints", () => {
@@ -25,5 +32,27 @@ describe("fetchSprints", () => {
     axios.get.mockRejectedValue(new Error("Failed to fetch sprints"));
 
     await expect(fetchSprints()).rejects.toThrow("Failed to fetch sprints");
+  });
+});
+
+describe("deleteSprint", () => {
+  it("should delete sprint successfully", async () => {
+    const sprintId = 1;
+
+    axios.delete.mockResolvedValue({});
+
+    await deleteSprint(sprintId);
+
+    expect(axios.delete).toHaveBeenCalledWith(`http://127.0.0.1:8000/api/sprints/${sprintId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+  });
+
+  it("should handle errors", async () => {
+    const sprintId = 1;
+
+    axios.delete.mockRejectedValue(new Error("Failed to delete sprint"));
+
+    await expect(deleteSprint(sprintId)).rejects.toThrow("Failed to delete sprint");
   });
 });
