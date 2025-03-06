@@ -1,5 +1,3 @@
-import { formatDateTimeForTask } from "./utils";
-
 export const downloadTasksIcsFile = (tasks) => {
   const icsContent = generateICSContentForTasks(tasks);
   const blob = new Blob([icsContent], { type: "text/calendar" });

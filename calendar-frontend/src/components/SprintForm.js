@@ -1,8 +1,13 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Form.css";
 
-const SprintForm = ({ selectedSprint, onSprintAdded, fetchSprints, onClose }) => {
+const SprintForm = ({
+  selectedSprint,
+  onSprintAdded,
+  fetchSprints,
+  onClose,
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     start: "",
@@ -15,13 +20,12 @@ const SprintForm = ({ selectedSprint, onSprintAdded, fetchSprints, onClose }) =>
     const date = new Date(dateString);
     return date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
   };
-  
 
   useEffect(() => {
     if (selectedSprint) {
       setFormData({
         name: selectedSprint.title || "",
-        start: formatDate(selectedSprint.start), 
+        start: formatDate(selectedSprint.start),
         end: formatDate(selectedSprint.end),
         color: selectedSprint.color || "#0B0BFF",
       });
@@ -61,24 +65,23 @@ const SprintForm = ({ selectedSprint, onSprintAdded, fetchSprints, onClose }) =>
         })
         .catch(() => alert("Failed to update sprint"));
     } else {
-     
-     axios
-     .post(
-       `http://127.0.0.1:8000/api/sprints`,
-       { ...formData },
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       }
-     )
-     .then((response) => {
-       onSprintAdded(response.data);
-       fetchSprints();
-       onClose();
-     })
-     .catch(() => alert("Failed to add sprint"));
- }
+      axios
+        .post(
+          `http://127.0.0.1:8000/api/sprints`,
+          { ...formData },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          onSprintAdded(response.data);
+          fetchSprints();
+          onClose();
+        })
+        .catch(() => alert("Failed to add sprint"));
+    }
   };
 
   return (

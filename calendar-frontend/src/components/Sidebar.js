@@ -3,8 +3,7 @@ import { MdLogout } from "react-icons/md";
 import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
-import { AiOutlineHome } from "react-icons/ai";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -17,10 +16,6 @@ const Sidebar = ({ children, setSelectedDate }) => {
   const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
-
-  const apiKey = "XIFQgI5hvpgIer8vkkjiSCQPeu0l2JSo";
-  const country = "RS";
-  const year = 2025;
 
   const toggleTasksCollapse = () => {
     setIsTasksCollapsed(!isTasksCollapsed);
@@ -68,7 +63,9 @@ const Sidebar = ({ children, setSelectedDate }) => {
               return dayNames[args.date.getUTCDay()];
             }}
             titleFormat={{ month: "short", year: "numeric" }}
-            dateClick={(info) => setSelectedDate(info.date)}
+            dateClick={(info) => {
+              if (setSelectedDate) setSelectedDate(info.date);
+            }}
             contentHeight={"auto"}
           />
         </div>

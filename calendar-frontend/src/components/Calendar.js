@@ -15,7 +15,13 @@ import {
   formatDateTimeForTask,
   convertToLocalDate,
 } from "./utils";
-import { fetchSprints, fetchTasks,fetchLoggedInUser, deleteSprint, deleteTask } from "./api";
+import {
+  fetchSprints,
+  fetchTasks,
+  fetchLoggedInUser,
+  deleteSprint,
+  deleteTask,
+} from "./api";
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
 import { useFetchData, useHandleClickOutside } from "../hooks/calendarHooks";
 
@@ -46,7 +52,7 @@ const Calendar = ({ selectedDate }) => {
   const calendarRef = useRef(null);
   const sprintDetailsRef = useRef(null);
   const taskDetailsRef = useRef(null);
-  const [user,setUser]=useState(null);
+  const [user, setUser] = useState(null);
 
   useFetchData(setSprints, setTasks, setHolidays, country, year, refresh);
 
@@ -56,25 +62,21 @@ const Calendar = ({ selectedDate }) => {
   );
   useHandleClickOutside(taskDetailsRef, null, () => setShowTaskDetails(false));
 
-
   const fetchUserData = async () => {
-     
     try {
       const userData = await fetchLoggedInUser();
       setUser(userData);
     } catch (error) {
       alert("Failed to fetch user data");
     }
-
   };
 
   useEffect(() => {
-    fetchUserData();  
+    fetchUserData();
   }, []);
 
   // Goes to date selected in sidebar
   useEffect(() => {
-
     if (selectedDate && calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.gotoDate(selectedDate);
