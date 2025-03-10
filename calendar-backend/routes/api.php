@@ -30,12 +30,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('tasks/assign-sprint', [TaskController::class, 'assignTaskToSprint'])->name('task.assignSprint');
     Route::resource('tasks', TaskController::class);
 
+    // Tasks associated with the logged-in user 
+    Route::get('/user/tasks', [TaskController::class, 'userTasks'])->name('user.tasks');
+
     // Sprints associated with the logged-in user
     Route::get('user/sprints', [SprintController::class, 'userSprints'])->name('user.sprints');
     Route::get('/user/active-teams', [UserController::class, 'activeTeams']);
     Route::get('/user/archived-teams', [UserController::class, 'archivedTeams']);
     Route::put('/user/teams/{sprint_id}/status/{status}', [UserController::class, 'updateTeamStatus']);
+    
 
+    // Sprints  associated with the logged-in user with all tasks in that sprint
+    Route::get('/user/sprints/tasks', [TaskController::class, 'tasksInUserSprint'])->name('user.sprint.tasks');
+    
+    
     // Scrum master routes
     Route::group(['middleware' => ['auth:scrum-master']], function () {
         Route::get('sprints', [SprintController::class, 'index'])->name('sprints.index');

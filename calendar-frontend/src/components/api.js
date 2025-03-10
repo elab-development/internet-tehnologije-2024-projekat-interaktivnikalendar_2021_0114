@@ -12,7 +12,7 @@ export const fetchSprints = async () => {
 
 export const fetchTasks = async () => {
   const token = localStorage.getItem("token");
-  const response = await axios.get(`${API_BASE_URL}/tasks`, {
+  const response = await axios.get(`${API_BASE_URL}/user/tasks`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

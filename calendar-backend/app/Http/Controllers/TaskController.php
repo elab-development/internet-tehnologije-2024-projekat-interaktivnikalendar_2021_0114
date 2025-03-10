@@ -136,10 +136,38 @@ class TaskController extends Controller
         return response()->json('Task deleted successfully.');
     }
 
+    //Assign a task to a sprint
     public function assignTaskToSprint(Request $request)
     {
         $user = $request->user();
         $sprints = $user->sprints()->with('users')->get();
         return response()->json($sprints);
     }
+
+    //Get all tasks associated with the logged-in user's sprint
+    public function tasksInUserSprint(Request $request)
+    {
+        $user = $request->user();
+        $sprints = $user->sprints()->with('tasks')->get();
+
+        $tasks = [];
+        foreach ($sprints as $sprint) {
+            foreach ($sprint->tasks as $task) {
+                $tasks[] = $task;
+            }
+        }
+
+        return response()->json(['sprints' => $sprints]);
+    }
+ 
+    //Get all tasks associated with the logged-in user
+    public function userTasks(Request $request)
+    {
+        $user = $request->user(); 
+    
+        $tasks = Task::where('user_id', $user->id)->get();
+    
+        return response()->json($tasks);
+    }
+
 }
