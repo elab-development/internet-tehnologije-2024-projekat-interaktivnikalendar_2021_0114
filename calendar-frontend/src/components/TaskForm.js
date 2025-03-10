@@ -81,6 +81,19 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
+    // Validate task start and end dates
+    const taskStart = new Date(formData.start);
+    const taskEnd = new Date(formData.end);
+    const sprintStart = new Date(selectedSprint.start);
+    const sprintEnd = new Date(selectedSprint.end);
+  
+
+    if (taskStart < sprintStart || taskEnd > sprintEnd) {
+      alert("Task start and end dates must be within the sprint period.");
+      return;
+    }
+
+
     if (selectedTask) {
       // Update existing task
       axios
@@ -153,6 +166,8 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               type="datetime-local"
               name="start"
               value={formData.start}
+              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
               onChange={handleInputChange}
               required
             />
@@ -164,6 +179,8 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               type="datetime-local"
               name="end"
               value={formData.end}
+              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
               onChange={handleInputChange}
               required
             />

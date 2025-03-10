@@ -4,7 +4,6 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
-import Sidebar from "./components/Sidebar";
 import PrivateRoute from "./components/PrivateRoute";
 import Teams from "./pages/Teams";
 import CalendarPage from "./pages/CalendarPage";
