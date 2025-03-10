@@ -42,6 +42,22 @@ export const fetchLoggedInUser = async () => {
   return response.data;
 };
 
+export const fetchSprintWithTasks = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/user/sprints/tasks`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data.sprints;
+}
+
+export const fetchTasksBySprint = async (sprintId) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/sprints/${sprintId}/tasks`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data.tasks;
+}
+
 export const fetchActiveTeams = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user/active-teams`, {

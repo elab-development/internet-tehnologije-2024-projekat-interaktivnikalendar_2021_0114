@@ -135,6 +135,16 @@ class TaskController extends Controller
         $task->delete();
         return response()->json('Task deleted successfully.');
     }
+    
+    //Get all tasks associated with the logged-in user
+    public function userTasks(Request $request)
+    {
+        $user = $request->user(); 
+    
+        $tasks = Task::where('user_id', $user->id)->get();
+    
+        return response()->json($tasks);
+    }
 
     //Assign a task to a sprint
     public function assignTaskToSprint(Request $request)
@@ -143,6 +153,8 @@ class TaskController extends Controller
         $sprints = $user->sprints()->with('users')->get();
         return response()->json($sprints);
     }
+
+    
 
     //Get all tasks associated with the logged-in user's sprint
     public function tasksInUserSprint(Request $request)
@@ -159,15 +171,17 @@ class TaskController extends Controller
 
         return response()->json(['sprints' => $sprints]);
     }
- 
-    //Get all tasks associated with the logged-in user
-    public function userTasks(Request $request)
-    {
-        $user = $request->user(); 
-    
-        $tasks = Task::where('user_id', $user->id)->get();
-    
-        return response()->json($tasks);
-    }
 
+    public function tasksInSprint(Request $request, $sprint_id)
+    {
+        $sprint = Sprint::find($sprint_id);
+        if (!$sprint) {
+            return response()->json(['message' => 'Sprint not found'], 404);
+        }
+
+        $tasks = $sprint->tasks()->with('user')->get();
+        return response()->json(['tasks' => $tasks]);
+    }
+ 
+    
 }

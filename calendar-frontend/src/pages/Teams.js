@@ -90,7 +90,6 @@ const Teams = () => {
                     </div>
                   ))}
               </div>
-              {loggedUser && loggedUser.role.name === "Scrum Master" && (
               <p className="archive-btn">
                 <span
                   onClick={() => {
@@ -102,7 +101,6 @@ const Teams = () => {
                   Archive
                 </span>
               </p>
-              )}
             </div>
           ))}
           <hr />

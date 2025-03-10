@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Sprints  associated with the logged-in user with all tasks in that sprint
     Route::get('/user/sprints/tasks', [TaskController::class, 'tasksInUserSprint'])->name('user.sprint.tasks');
     
+    Route::get('/sprints/{sprint_id}/tasks', [TaskController::class, 'tasksInSprint'])->name('sprint.tasks');
     
     // Scrum master routes
     Route::group(['middleware' => ['auth:scrum-master']], function () {

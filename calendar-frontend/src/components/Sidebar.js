@@ -3,19 +3,36 @@ import { MdLogout } from "react-icons/md";
 import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
-import { useState } from "react";
+import {useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { fetchSprints } from "./api";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
-const Sidebar = ({ children, setSelectedDate }) => {
+const Sidebar = ({ children, setSelectedDate}) => {
   const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
+  const [sprints, setSprints] = useState([]);
+  
+
+  useEffect(() => {
+    const fetchSprint = async () => {
+      try {
+        const sprintsData = await fetchSprints();
+        setSprints(Array.isArray(sprintsData) ? sprintsData : []);
+       // console.log("Sprints for sidebar", sprintsData);
+      } catch (error) {
+        console.error("Failed to fetch sprints", error);
+      }
+    };
+  
+    fetchSprint();
+  }, []);
 
   const toggleTasksCollapse = () => {
     setIsTasksCollapsed(!isTasksCollapsed);
@@ -42,6 +59,10 @@ const Sidebar = ({ children, setSelectedDate }) => {
     } catch (error) {
       console.error("Logout failed", error);
     }
+  };
+
+  const handleSprintClick = (sprintId) => {
+    navigate(`/kanban?sprintId=${sprintId}`);
   };
 
   return (
@@ -90,7 +111,7 @@ const Sidebar = ({ children, setSelectedDate }) => {
           <hr />
           <div className="sidebar-section">
             <h3 onClick={toggleTasksCollapse}>
-              Tasks
+              Sprints
               {isTasksCollapsed ? (
                 <IoIosArrowBack className="arrow-icon" />
               ) : (
@@ -98,11 +119,11 @@ const Sidebar = ({ children, setSelectedDate }) => {
               )}
             </h3>
             {!isTasksCollapsed && (
-              <ul>
-                <li>Task 1</li>
-                <li>Task 2</li>
-                <li>Task 3</li>
-              </ul>
+             <ul>
+              {sprints.map((sprint) => (
+                  <li key={sprint.id} onClick={()=>handleSprintClick(sprint.id)} style={{ cursor: "pointer" }}>{sprint.name}</li>
+                ))}
+           </ul>
             )}
           </div>
 

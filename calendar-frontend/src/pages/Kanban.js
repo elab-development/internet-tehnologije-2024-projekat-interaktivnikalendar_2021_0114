@@ -1,32 +1,35 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import KanbanTicket from "../components/KanbanTicket";
 import Sidebar from "../components/Sidebar";
 import "../styles/Kanban.css";
-import { fetchTasks, deleteTask } from "../components/api";
+import { fetchTasksBySprint, deleteTask } from "../components/api";
 import { MdAdd } from "react-icons/md";
 
 const Kanban = () => {
   const [tasks, setTasks] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
-    let active = true;
-    const getTasks = async () => {
-      try {
-        const tasksData = await fetchTasks();
-        if (active) {
-          setTasks(tasksData);
-        }
-      } catch (error) {
-        if (active) {
+    const params = new URLSearchParams(location.search);
+    const sprintId = params.get("sprintId");
+
+    if (sprintId) {
+      const getTasks = async () => {
+        try {
+          const tasksData = await fetchTasksBySprint(sprintId);
+          if (Array.isArray(tasksData)) {
+            setTasks(tasksData);
+          } else {
+            console.error("Unexpected response format:", tasksData);
+          }
+        } catch (error) {
           alert("Failed to fetch tasks");
         }
-      }
-    };
-    getTasks();
-    return () => {
-      active = false;
-    };
-  }, []);
+      };
+      getTasks();
+    }
+  }, [location.search]);
 
   const handleDelete = async (taskId) => {
     try {
@@ -55,7 +58,7 @@ const Kanban = () => {
 
             <span className="status">Backlog</span>
             {tasks
-              .filter((task) => task.status === "Backlog")
+              .filter((task) => task.status.toLowerCase() === "backlog")
               .map((task) => (
                 <KanbanTicket
                   key={task.id}
@@ -77,7 +80,7 @@ const Kanban = () => {
               In Progress
             </span>
             {tasks
-              .filter((task) => task.status === "In progress")
+              .filter((task) => task.status.toLowerCase() === "in progress")
               .map((task) => (
                 <KanbanTicket
                   key={task.id}
@@ -99,7 +102,7 @@ const Kanban = () => {
               Done
             </span>
             {tasks
-              .filter((task) => task.status === "Done")
+              .filter((task) => task.status.toLowerCase() === "done")
               .map((task) => (
                 <KanbanTicket
                   key={task.id}
