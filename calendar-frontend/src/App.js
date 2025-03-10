@@ -8,6 +8,7 @@ import Sidebar from "./components/Sidebar";
 import PrivateRoute from "./components/PrivateRoute";
 import Teams from "./pages/Teams";
 import CalendarPage from "./pages/CalendarPage";
+import Kanban from "./pages/Kanban";
 
 function App() {
   return (
@@ -28,10 +29,9 @@ function App() {
           <Route
             path="kanban"
             element={
-              // Just a placeholder for now
-              <div style={{ display: "flex" }}>
-                <Sidebar /> <h1>Kanban</h1>
-              </div>
+              <PrivateRoute>
+                <Kanban />
+              </PrivateRoute>
             }
           />
           <Route

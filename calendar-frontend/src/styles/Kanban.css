@@ -1,0 +1,60 @@
+.kanban-page {
+    width: 100%;
+    margin: 5rem 4rem;
+}
+
+.kanban-page>p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--dark-grey);
+}
+
+.kanban-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.kanban-column {
+    width: 26%;
+    height: fit-content;
+    padding: 1rem;
+    overflow-y: auto;
+    position: relative;
+}
+
+.kanban-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status {
+    font-size: 0.8rem;
+    color: var(--dark-grey);
+    background-color: var(--grey);
+    padding: 0 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.add-ticket {
+    position: absolute;
+    top: 1.2rem;
+    right: 1rem;
+    display: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.2rem 0.4rem;
+}
+
+.add-ticket>svg {
+    fill: var(--dark-grey);
+}
+
+.kanban-column:hover .add-ticket {
+    display: flex;
+    border-radius: 0.2rem;
+}
+
+.add-ticket:hover {
+    background-color: var(--grey);
+}

@@ -51,6 +51,7 @@ const Teams = () => {
                 <FaRegPlusSquare
                   className="assign-icon"
                   onClick={() => setSelectedSprintId(sprint.id)}
+                  title="Add user to sprint"
                 />
               </div>
               <div className="users">
@@ -67,6 +68,7 @@ const Teams = () => {
                           removeUserFromSprint(sprint.id, user.id);
                           setRefresh((prev) => !prev);
                         }}
+                        title="Remove user from sprint"
                       >
                         Remove
                       </button>
@@ -79,6 +81,7 @@ const Teams = () => {
                     updateTeamStatus(sprint.id, false);
                     setRefresh((prev) => !prev);
                   }}
+                  title="Archive team"
                 >
                   Archive
                 </span>
@@ -109,6 +112,7 @@ const Teams = () => {
                         updateTeamStatus(sprint.id, true);
                         setRefresh((prev) => !prev);
                       }}
+                      title="Restore team"
                     >
                       Restore
                     </p>
