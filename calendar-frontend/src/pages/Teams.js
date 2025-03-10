@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import InvitationForm from "../components/InvitationForm";
 import "../styles/Teams.css";
-import { removeUserFromSprint, updateTeamStatus } from "../components/api";
+import { removeUserFromSprint, updateTeamStatus, fetchLoggedInUser } from "../components/api";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
 import { useLocation } from "react-router-dom";
@@ -14,6 +14,7 @@ const Teams = () => {
   const [showArchivedTeams, setShowArchivedTeams] = useState(false);
   const [archivedSprints, setArchivedSprints] = useState([]);
   const [selectedSprintId, setSelectedSprintId] = useState(null);
+  const [loggedUser, setUser] = useState(null);
 
   const location = useLocation();
 
@@ -24,7 +25,17 @@ const Teams = () => {
     setShowArchivedTeams((prev) => !prev);
   };
 
+  const fetchUserData = async () => {
+    try {
+      const userData = await fetchLoggedInUser();
+      setUser(userData);
+    } catch (error) {
+      alert("Failed to fetch user data");
+    }
+  };
+
   useEffect(() => {
+    fetchUserData();
     const params = new URLSearchParams(location.search);
     if (params.get("joined") === "true") {
       alert("Successfully joined the team!");
@@ -48,11 +59,13 @@ const Teams = () => {
             >
               <div className="sprint-header">
                 <span>Sprint: {sprint.name}</span>
+                {loggedUser && loggedUser.role.name === "Scrum Master" && (
                 <FaRegPlusSquare
                   className="assign-icon"
                   onClick={() => setSelectedSprintId(sprint.id)}
                   title="Add user to sprint"
                 />
+                )}
               </div>
               <div className="users">
                 {sprint.users &&
@@ -62,6 +75,7 @@ const Teams = () => {
                         <span>{user.name}</span>
                         <p className="user-role">{user.role.name}</p>
                       </div>
+                      {loggedUser && loggedUser.role.name === "Scrum Master" && (
                       <button
                         className="remove-user-btn"
                         onClick={() => {
@@ -72,9 +86,11 @@ const Teams = () => {
                       >
                         Remove
                       </button>
+                      )}
                     </div>
                   ))}
               </div>
+              {loggedUser && loggedUser.role.name === "Scrum Master" && (
               <p className="archive-btn">
                 <span
                   onClick={() => {
@@ -86,6 +102,7 @@ const Teams = () => {
                   Archive
                 </span>
               </p>
+              )}
             </div>
           ))}
           <hr />
