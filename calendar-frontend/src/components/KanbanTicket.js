@@ -2,8 +2,6 @@ import "../styles/KanbanTicket.css";
 import { MdDelete, MdEdit } from "react-icons/md";
 
 const KanbanTicket = ({ task, onDelete }) => {
-  console.log("task", task);
-
   const formatDate = (dateString) => {
     const options = {
       day: "2-digit",
@@ -12,7 +10,10 @@ const KanbanTicket = ({ task, onDelete }) => {
       hour: "2-digit",
       minute: "2-digit",
     };
-    return new Date(dateString.replace(" ", "T")).toLocaleString("en-GB", options);
+    return new Date(dateString.replace(" ", "T")).toLocaleString(
+      "en-GB",
+      options
+    );
   };
   return (
     <div>
@@ -21,8 +22,8 @@ const KanbanTicket = ({ task, onDelete }) => {
           <p>{task.name}</p>
         </div>
         <div className="ticket-body">
-          <p>Assigned to: {task.user ? task.user.name : "Unassigned"}</p> 
-          <p>Due:  {formatDate(task.end)}</p>
+          <p>Assigned to: {task.user ? task.user.name : "Unassigned"}</p>
+          <p>Due: {formatDate(task.end)}</p>
           <p>
             Priority: <span className="ticket-priority">High</span>
           </p>

@@ -86,13 +86,11 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     const taskEnd = new Date(formData.end);
     const sprintStart = new Date(selectedSprint.start);
     const sprintEnd = new Date(selectedSprint.end);
-  
 
     if (taskStart < sprintStart || taskEnd > sprintEnd) {
       alert("Task start and end dates must be within the sprint period.");
       return;
     }
-
 
     if (selectedTask) {
       // Update existing task

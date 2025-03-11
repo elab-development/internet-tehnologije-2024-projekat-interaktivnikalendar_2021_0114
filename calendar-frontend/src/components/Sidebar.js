@@ -3,36 +3,34 @@ import { MdLogout } from "react-icons/md";
 import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
-import {useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { fetchSprints } from "./api";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { useFetchActiveTeams } from "../hooks/teamHooks";
 
-const Sidebar = ({ children, setSelectedDate}) => {
+const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
   const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
   const [sprints, setSprints] = useState([]);
-  
+  const [selectedSprint, setSelectedSprint] = useState(null);
 
+  useFetchActiveTeams(setSprints);
+
+  // TODO: This is called on every page sidebar is on find a way to call it only when seSprintId is not null
+  // Makes sure that the first sprint is selected by default
   useEffect(() => {
-    const fetchSprint = async () => {
-      try {
-        const sprintsData = await fetchSprints();
-        setSprints(Array.isArray(sprintsData) ? sprintsData : []);
-       // console.log("Sprints for sidebar", sprintsData);
-      } catch (error) {
-        console.error("Failed to fetch sprints", error);
-      }
-    };
-  
-    fetchSprint();
-  }, []);
+    console.log("Sprints");
+    if (sprints.length > 0 && selectedSprint === null) {
+      setSelectedSprint(sprints[0].id);
+      if (setSprintId) setSprintId(sprints[0].id);
+    }
+  }, [sprints]);
 
   const toggleTasksCollapse = () => {
     setIsTasksCollapsed(!isTasksCollapsed);
@@ -62,7 +60,8 @@ const Sidebar = ({ children, setSelectedDate}) => {
   };
 
   const handleSprintClick = (sprintId) => {
-    navigate(`/kanban?sprintId=${sprintId}`);
+    setSelectedSprint(sprintId);
+    if (setSprintId) setSprintId(sprintId);
   };
 
   return (
@@ -109,23 +108,35 @@ const Sidebar = ({ children, setSelectedDate}) => {
             </NavLink>
           </div>
           <hr />
-          <div className="sidebar-section">
-            <h3 onClick={toggleTasksCollapse}>
-              Sprints
-              {isTasksCollapsed ? (
-                <IoIosArrowBack className="arrow-icon" />
-              ) : (
-                <IoIosArrowDown className="arrow-icon" />
-              )}
-            </h3>
-            {!isTasksCollapsed && (
-             <ul>
-              {sprints.map((sprint) => (
-                  <li key={sprint.id} onClick={()=>handleSprintClick(sprint.id)} style={{ cursor: "pointer" }}>{sprint.name}</li>
+          {setSprintId && (
+            <div className="sidebar-section">
+              <h3 onClick={toggleTasksCollapse}>
+                Sprints
+                {isTasksCollapsed ? (
+                  <IoIosArrowBack className="arrow-icon" />
+                ) : (
+                  <IoIosArrowDown className="arrow-icon" />
+                )}
+              </h3>
+              {/* TODO: Style checkboxes */}
+              {!isTasksCollapsed &&
+                sprints.map((sprint) => (
+                  <label
+                    key={sprint.id}
+                    className="filter-item"
+                    htmlFor={`sprint-${sprint.id}`}
+                  >
+                    <input
+                      type="checkbox"
+                      id={`sprint-${sprint.id}`}
+                      checked={selectedSprint === sprint.id}
+                      onChange={() => handleSprintClick(sprint.id)}
+                    />
+                    {sprint.name}
+                  </label>
                 ))}
-           </ul>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="sidebar-section">
             <h3 onClick={toggleFiltersCollapse}>

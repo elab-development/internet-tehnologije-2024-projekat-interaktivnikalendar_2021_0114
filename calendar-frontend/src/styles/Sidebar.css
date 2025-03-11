@@ -91,11 +91,6 @@
 }
 
 .small-calendar>.fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
-    /* min-height: 0px;
-    max-height: 7px;
-    display: flex;
-    justify-content: center;
-    align-items: center; */
     display: none;
 }
 
@@ -215,8 +210,21 @@ hr {
     margin: 0.5rem 0;
 }
 
-.sidebar-section ul li {
-    list-style-type: square;
-    font-size: 1vw;
-    color: var(--dark-grey);
+.filter-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+    margin-left: 1.2rem;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+}
+
+.filter-item input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.filter-item:hover {
+    background-color: var(--grey-v2);
+    border-radius: 4px;
 }

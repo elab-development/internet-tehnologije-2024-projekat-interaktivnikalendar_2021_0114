@@ -1,35 +1,40 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import KanbanTicket from "../components/KanbanTicket";
 import Sidebar from "../components/Sidebar";
 import "../styles/Kanban.css";
-import { fetchTasksBySprint, deleteTask } from "../components/api";
+import {
+  fetchTasksBySprint,
+  fetchPersonalTasksBySprint,
+  deleteTask,
+} from "../components/api";
 import { MdAdd } from "react-icons/md";
 
 const Kanban = () => {
   const [tasks, setTasks] = useState([]);
-  const location = useLocation();
+  const [selectedView, setSelectedView] = useState("personal");
+  const [sprintId, setSprintId] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const sprintId = params.get("sprintId");
+    const getTasks = async () => {
+      try {
+        const tasksData =
+          selectedView === "personal"
+            ? await fetchPersonalTasksBySprint(sprintId)
+            : await fetchTasksBySprint(sprintId);
+        if (Array.isArray(tasksData)) {
+          setTasks(tasksData);
+        } else {
+          console.error("Unexpected response format:", tasksData);
+        }
+      } catch (error) {
+        alert("Failed to fetch tasks");
+      }
+    };
 
     if (sprintId) {
-      const getTasks = async () => {
-        try {
-          const tasksData = await fetchTasksBySprint(sprintId);
-          if (Array.isArray(tasksData)) {
-            setTasks(tasksData);
-          } else {
-            console.error("Unexpected response format:", tasksData);
-          }
-        } catch (error) {
-          alert("Failed to fetch tasks");
-        }
-      };
       getTasks();
     }
-  }, [location.search]);
+  }, [sprintId, selectedView]);
 
   const handleDelete = async (taskId) => {
     try {
@@ -42,7 +47,7 @@ const Kanban = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar />
+      <Sidebar setSprintId={setSprintId} />
       <div className="kanban-page">
         <h2>Kanban</h2>
         <p>
@@ -50,6 +55,26 @@ const Kanban = () => {
           and intuitive way.
         </p>
         <hr />
+
+        <div className="kanban-view">
+          <button
+            className={`kanban-view-btn ${
+              selectedView === "personal" ? "kanban-selected-view" : ""
+            }`}
+            onClick={() => setSelectedView("personal")}
+          >
+            Personal
+          </button>
+          <button
+            className={`kanban-view-btn ${
+              selectedView === "shared" ? "kanban-selected-view" : ""
+            }`}
+            onClick={() => setSelectedView("shared")}
+          >
+            Shared
+          </button>
+        </div>
+
         <div className="kanban-container">
           <div className="kanban-column">
             <div className="add-ticket" title="Add task">

@@ -48,15 +48,29 @@ export const fetchSprintWithTasks = async () => {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data.sprints;
-}
+};
 
 export const fetchTasksBySprint = async (sprintId) => {
   const token = localStorage.getItem("token");
-  const response = await axios.get(`${API_BASE_URL}/sprints/${sprintId}/tasks`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axios.get(
+    `${API_BASE_URL}/sprints/${sprintId}/tasks`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data.tasks;
-}
+};
+
+export const fetchPersonalTasksBySprint = async (sprintId) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(
+    `${API_BASE_URL}/sprints/${sprintId}/user/tasks`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data.tasks;
+};
 
 export const fetchActiveTeams = async () => {
   const token = localStorage.getItem("token");
