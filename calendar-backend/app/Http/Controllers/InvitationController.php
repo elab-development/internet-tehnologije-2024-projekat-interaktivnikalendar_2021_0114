@@ -50,5 +50,5 @@ class InvitationController extends Controller
 
         $invitation->delete();
 
-        return redirect("http://localhost:3000/teams?sprint_id={$sprint->id}&joined=true");    }
+        return redirect("http://localhost:3000/login");    }
 }

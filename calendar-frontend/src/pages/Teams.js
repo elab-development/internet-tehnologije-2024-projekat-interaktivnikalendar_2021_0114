@@ -5,7 +5,6 @@ import "../styles/Teams.css";
 import { removeUserFromSprint, updateTeamStatus, fetchLoggedInUser } from "../components/api";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowDown } from "react-icons/io";
-import { useLocation } from "react-router-dom";
 import { useFetchActiveTeams, useFetchArchivedTeams } from "../hooks/teamHooks";
 
 const Teams = () => {
@@ -16,7 +15,6 @@ const Teams = () => {
   const [selectedSprintId, setSelectedSprintId] = useState(null);
   const [loggedUser, setUser] = useState(null);
 
-  const location = useLocation();
 
   useFetchActiveTeams(setSprints, refresh);
   useFetchArchivedTeams(setArchivedSprints, showArchivedTeams, refresh);
@@ -28,7 +26,7 @@ const Teams = () => {
   const fetchUserData = async () => {
     try {
       const userData = await fetchLoggedInUser();
-      setUser(userData);
+      setUser(userData); 
     } catch (error) {
       alert("Failed to fetch user data");
     }
@@ -36,12 +34,7 @@ const Teams = () => {
 
   useEffect(() => {
     fetchUserData();
-    const params = new URLSearchParams(location.search);
-    if (params.get("joined") === "true") {
-      alert("Successfully joined the team!");
-      setRefresh((prev) => !prev);
-    }
-  }, [location.search]);
+  }, []);
 
   return (
     <div style={{ display: "flex" }}>
