@@ -164,9 +164,14 @@ const Calendar = ({ selectedDate }) => {
   };
 
   const prepareSprintEvents = (sprints) => {
-    console.log("Sprints:", sprints);
+   // console.log("Sprints:", sprints);
     return (Array.isArray(sprints) ? sprints : [])
       .map((sprint) => {
+        // Check if the sprint is an array with a success message and the sprint object
+        if (Array.isArray(sprint) && sprint.length === 2 && typeof sprint[0] === "string" && typeof sprint[1] === "object") {
+          sprint = sprint[1]; // Extract the sprint object
+        }
+  
         if (!sprint || !sprint.name || !sprint.start || !sprint.end) {
           console.error("Invalid sprint data:", sprint);
           return null;
@@ -185,10 +190,15 @@ const Calendar = ({ selectedDate }) => {
   };
 
   const prepareTaskEvents = (tasks) => {
+    //console.log("Tasks:", tasks);
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
+        // Check if the task is an array with a success message and the task object
+        if (Array.isArray(task) && task.length === 2 && typeof task[0] === "string" && typeof task[1] === "object") {
+          task = task[1]; // Extract the task object
+        }
+  
         if (!task || !task.name || !task.start || !task.end) {
-          console.log("Processing task:", task);
           console.error("Invalid task data:", task);
           return null;
         }

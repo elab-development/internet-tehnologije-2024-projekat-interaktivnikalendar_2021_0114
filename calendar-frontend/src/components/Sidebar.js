@@ -4,36 +4,41 @@ import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
 import { BsKanban, BsCalendar } from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useFetchActiveTeams } from "../hooks/teamHooks";
+import { fetchActiveTeams } from "./api";
 
 const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
-  const [isTasksCollapsed, setIsTasksCollapsed] = useState(false);
+  const [isSprintsCollapsed, setIsSprintsCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
   const [sprints, setSprints] = useState([]);
   const [selectedSprint, setSelectedSprint] = useState(null);
+  const location = useLocation();
 
-  useFetchActiveTeams(setSprints);
-
-  // TODO: This is called on every page sidebar is on find a way to call it only when seSprintId is not null
-  // Makes sure that the first sprint is selected by default
-  useEffect(() => {
-    console.log("Sprints");
-    if (sprints.length > 0 && selectedSprint === null) {
-      setSelectedSprint(sprints[0].id);
-      if (setSprintId) setSprintId(sprints[0].id);
+  const fetchSprintsData = async () => {
+    try {
+      console.log("Fetching sprints sidebar.");
+      const sprintsData = await fetchActiveTeams();
+      setSprints(sprintsData);
+      console.log("Sprints fetched successfully.", sprintsData);
+    } catch (error) {
+      alert("Failed to fetch sprints");
     }
-  }, [sprints]);
+  };
+
+  useEffect(() => {
+    if (location.pathname === "/kanban") {
+      fetchSprintsData();
+    }
+  }, [location.pathname]);
 
   const toggleTasksCollapse = () => {
-    setIsTasksCollapsed(!isTasksCollapsed);
+    setIsSprintsCollapsed(!isSprintsCollapsed);
   };
 
   const toggleFiltersCollapse = () => {
@@ -112,14 +117,14 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
             <div className="sidebar-section">
               <h3 onClick={toggleTasksCollapse}>
                 Sprints
-                {isTasksCollapsed ? (
+                {isSprintsCollapsed ? (
                   <IoIosArrowBack className="arrow-icon" />
                 ) : (
                   <IoIosArrowDown className="arrow-icon" />
                 )}
               </h3>
               {/* TODO: Style checkboxes */}
-              {!isTasksCollapsed &&
+              {!isSprintsCollapsed &&
                 sprints.map((sprint) => (
                   <label
                     key={sprint.id}

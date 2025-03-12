@@ -115,6 +115,7 @@ const SprintForm = ({
               type="date"
               name="end"
               value={formData.end}
+              min={formData.start}
               onChange={handleInputChange}
               required
             />
