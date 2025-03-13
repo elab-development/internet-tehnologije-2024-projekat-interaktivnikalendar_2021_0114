@@ -75,6 +75,12 @@ class UserController extends Controller
         $user->delete();
         return response()->json('User deleted successfully', 204);
     }
+    
+    public function getUserWithRole(Request $request)
+    {
+        $user = $request->user()->load('role');
+        return response()->json($user);
+    }
 
     public function activeTeams(Request $request)
     {
@@ -99,9 +105,5 @@ class UserController extends Controller
         return response()->json(['message' => 'Status updated successfully']);
     }
 
-    public function getUserWithRole(Request $request)
-    {
-        $user = $request->user()->load('role');
-        return response()->json($user);
-    }
+    
 }

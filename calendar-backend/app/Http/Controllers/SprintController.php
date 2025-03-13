@@ -117,7 +117,8 @@ class SprintController extends Controller
         $sprints = $user->sprints()->with('users.role')->get(); // Include user roles
         return response()->json($sprints);
     }
-
+ 
+    //Ovo smo koristi pre nego sto smo kreirali invitationForm
     public function assignUserToSprint($sprint_id, $user_id)
     {
         $sprint = Sprint::find($sprint_id);

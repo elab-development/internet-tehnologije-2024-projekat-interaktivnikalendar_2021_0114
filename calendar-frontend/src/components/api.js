@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
+//vraca sve sprintove kojima pripada ulogovani korisnik
 export const fetchSprints = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user/sprints`, {
@@ -10,6 +11,7 @@ export const fetchSprints = async () => {
   return response.data;
 };
 
+//vraca sve zadatke koji pripadaju ulogovanom korisniku
 export const fetchTasks = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user/tasks`, {
@@ -34,6 +36,7 @@ export const fetchHolidays = async (country, year) => {
   }));
 };
 
+//vraca ulogovanog korisnika sa njegovom ulogom
 export const fetchLoggedInUser = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user-with-role`, {
@@ -42,14 +45,8 @@ export const fetchLoggedInUser = async () => {
   return response.data;
 };
 
-export const fetchSprintWithTasks = async () => {
-  const token = localStorage.getItem("token");
-  const response = await axios.get(`${API_BASE_URL}/user/sprints/tasks`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data.sprints;
-};
 
+//Vraca sve zadatke koji pripadaju sprintu zajedno sa korisnicima koji su zaduzeni za njih - Kanban board shared tasks 
 export const fetchTasksBySprint = async (sprintId) => {
   const token = localStorage.getItem("token");
   const response = await axios.get(
@@ -61,6 +58,7 @@ export const fetchTasksBySprint = async (sprintId) => {
   return response.data.tasks;
 };
 
+//vraca sve zadatke ulogovanog usera koji pripadaju sprintu - Kanban board personal tasks
 export const fetchPersonalTasksBySprint = async (sprintId) => {
   const token = localStorage.getItem("token");
   const response = await axios.get(
@@ -88,6 +86,48 @@ export const fetchArchivedTeams = async () => {
   return response.data;
 };
 
+export const updateTeamStatus = async (sprint_id, status) => {
+  const token = localStorage.getItem("token");
+  await axios.put(
+    `${API_BASE_URL}/user/teams/${sprint_id}/status/${status}`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+};
+
+export const removeUserFromSprint = async (sprint_id, user_id) => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(`${API_BASE_URL}/assign/${sprint_id}/${user_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (error) {
+    console.error("Error: " + error.message);
+  }
+};
+
+//This function doesnt make sense
+export const assignTaskToSprint = async () => {
+  console.log("Fetching Sprints api.js");
+
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/tasks/assign-sprint`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log("Fetching Sprints for Tasks:", response.data);
+  return response.data;
+};
+
+export const sendInvitation = async (data) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`${API_BASE_URL}/invitations`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
 export const deleteSprint = async (sprintId) => {
   const token = localStorage.getItem("token");
   await axios.delete(`${API_BASE_URL}/sprints/${sprintId}`, {
@@ -102,6 +142,17 @@ export const deleteTask = async (taskId) => {
   });
 };
 
+
+
+export const fetchSprintWithTasks = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_BASE_URL}/user/sprints/tasks`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data.sprints;
+};
+
+//koristili smo pre nego sto smo implementirali invitation
 export const assignUserToSprint = async (sprint_id) => {
   const user_id = prompt("Enter the user ID to assign to the sprint:");
 
@@ -117,45 +168,4 @@ export const assignUserToSprint = async (sprint_id) => {
   } catch (error) {
     console.error("Error: " + error.message);
   }
-};
-
-export const removeUserFromSprint = async (sprint_id, user_id) => {
-  try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`${API_BASE_URL}/assign/${sprint_id}/${user_id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  } catch (error) {
-    console.error("Error: " + error.message);
-  }
-};
-
-export const assignTaskToSprint = async () => {
-  console.log("Fetching Sprints api.js");
-
-  const token = localStorage.getItem("token");
-  const response = await axios.get(`${API_BASE_URL}/tasks/assign-sprint`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  console.log("Fetching Sprints for Tasks:", response.data);
-  return response.data;
-};
-
-export const updateTeamStatus = async (sprint_id, status) => {
-  const token = localStorage.getItem("token");
-  await axios.put(
-    `${API_BASE_URL}/user/teams/${sprint_id}/status/${status}`,
-    {},
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-};
-
-export const sendInvitation = async (data) => {
-  const token = localStorage.getItem("token");
-  const response = await axios.post(`${API_BASE_URL}/invitations`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
 };

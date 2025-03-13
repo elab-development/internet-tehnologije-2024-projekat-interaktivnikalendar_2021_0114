@@ -155,8 +155,7 @@ class TaskController extends Controller
     }
 
 
-
-    //Get all tasks associated with the logged-in user's sprint
+    //Sprints  associated with the logged-in user with all tasks in that sprint
     public function tasksInUserSprint(Request $request)
     {
         $user = $request->user();
@@ -172,7 +171,7 @@ class TaskController extends Controller
         return response()->json(['sprints' => $sprints]);
     }
 
-    //Get all tasks in one sprint
+    //Get all tasks in one sprint - Kanban board shared tasks 
     public function tasksInSprint(Request $request, $sprint_id)
     {
         $sprint = Sprint::find($sprint_id);
@@ -184,7 +183,7 @@ class TaskController extends Controller
         return response()->json(['tasks' => $tasks]);
     }
 
-    //Get all tasks assigned to logged in user in one sprint
+    //Get all tasks assigned to logged in user in one sprint - Kanban board - personal tasks
     public function personalTasksInSprint(Request $request, $sprint_id)
     {
         $user = $request->user();
