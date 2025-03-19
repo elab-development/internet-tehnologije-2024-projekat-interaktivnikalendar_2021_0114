@@ -23,7 +23,7 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 
 // Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
-   
+
     // Task routes
     Route::resource('tasks', TaskController::class);
 
@@ -32,21 +32,24 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Assign a task to a sprint
     Route::get('tasks/assign-sprint', [TaskController::class, 'assignTaskToSprint'])->name('task.assignSprint');
-    
-    
+
+    // Update task status and order
+    Route::put('tasks/{id}/status-order', [TaskController::class, 'updateStatusAndOrder'])->name('tasks.updateStatusAndOrder');
+
     // Sprints  associated with the logged-in user with all tasks in that sprint
     Route::get('/user/sprints/tasks', [TaskController::class, 'tasksInUserSprint'])->name('user.sprint.tasks');
-    
+
     //Routes for kanban board
     Route::get('/sprints/{sprint_id}/tasks', [TaskController::class, 'tasksInSprint'])->name('sprint.tasks');
     Route::get('/sprints/{sprint_id}/user/tasks', [TaskController::class, 'personalTasksInSprint'])->name('personal.sprint.tasks');
-   
-   
+
+
     // Sprints associated with the logged-in user
     Route::get('user/sprints', [SprintController::class, 'userSprints'])->name('user.sprints');
     Route::get('/user/active-teams', [UserController::class, 'activeTeams']);
     Route::get('/user/archived-teams', [UserController::class, 'archivedTeams']);
     Route::put('/user/teams/{sprint_id}/status/{status}', [UserController::class, 'updateTeamStatus']);
+
 
     // Scrum master routes
     Route::group(['middleware' => ['auth:scrum-master']], function () {
@@ -62,7 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/assign/{sprint_id}/{user_id}', [SprintController::class, 'assignUserToSprint'])->name('sprint.assignUser');
         Route::delete('/assign/{sprint_id}/{user_id}', [SprintController::class, 'removeUserFromSprint'])->name('sprint.removeUser');
     });
-    
+
     Route::post('/invitations', [InvitationController::class, 'sendInvitation']);
     Route::get('/invitations/accept/{token}', [InvitationController::class, 'acceptInvitation']);
 

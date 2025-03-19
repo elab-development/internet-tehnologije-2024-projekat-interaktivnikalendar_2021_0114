@@ -45,8 +45,7 @@ export const fetchLoggedInUser = async () => {
   return response.data;
 };
 
-
-//Vraca sve zadatke koji pripadaju sprintu zajedno sa korisnicima koji su zaduzeni za njih - Kanban board shared tasks 
+//Vraca sve zadatke koji pripadaju sprintu zajedno sa korisnicima koji su zaduzeni za njih - Kanban board shared tasks
 export const fetchTasksBySprint = async (sprintId) => {
   const token = localStorage.getItem("token");
   const response = await axios.get(
@@ -142,8 +141,6 @@ export const deleteTask = async (taskId) => {
   });
 };
 
-
-
 export const fetchSprintWithTasks = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_BASE_URL}/user/sprints/tasks`, {
@@ -168,4 +165,15 @@ export const assignUserToSprint = async (sprint_id) => {
   } catch (error) {
     console.error("Error: " + error.message);
   }
+};
+
+export const updateTaskStatusAndOrder = async (taskId, status, newIndex) => {
+  const token = localStorage.getItem("token");
+  await axios.put(
+    `${API_BASE_URL}/tasks/${taskId}/status-order`,
+    { status, newIndex },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };

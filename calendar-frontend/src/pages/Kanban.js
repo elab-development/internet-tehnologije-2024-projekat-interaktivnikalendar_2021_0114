@@ -6,8 +6,10 @@ import {
   fetchTasksBySprint,
   fetchPersonalTasksBySprint,
   deleteTask,
+  updateTaskStatusAndOrder,
 } from "../components/api";
 import { MdAdd } from "react-icons/md";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 
 const Kanban = () => {
   const [tasks, setTasks] = useState([]);
@@ -22,7 +24,7 @@ const Kanban = () => {
             ? await fetchPersonalTasksBySprint(sprintId)
             : await fetchTasksBySprint(sprintId);
         if (Array.isArray(tasksData)) {
-          setTasks(tasksData);
+          setTasks(tasksData.sort((a, b) => a.order - b.order));
         } else {
           console.error("Unexpected response format:", tasksData);
         }
@@ -42,6 +44,63 @@ const Kanban = () => {
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
     } catch (error) {
       alert("Failed to delete task");
+    }
+  };
+
+  const onDragEnd = async (result) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    // Find the moved task
+    const movedTask = tasks.find((task) => task.id.toString() === draggableId);
+    if (!movedTask) return; // Safety check
+
+    // Create a new array of tasks without mutating the original state
+    let newTasks = tasks.map((task) => {
+      if (task.id === movedTask.id) {
+        return {
+          ...task,
+          status: destination.droppableId,
+          order: destination.index,
+        };
+      }
+      // Adjust order of other tasks in the same column
+      if (task.status === source.droppableId) {
+        if (task.order > source.index) {
+          return { ...task, order: task.order - 1 }; // Shift order up if below the moved task
+        }
+      }
+      if (task.status === destination.droppableId) {
+        if (task.order >= destination.index) {
+          return { ...task, order: task.order + 1 }; // Shift order down to make space
+        }
+      }
+      return task;
+    });
+
+    // Sort by order to maintain correct structure
+    newTasks = newTasks.sort((a, b) => a.order - b.order);
+
+    // Update state optimistically
+    setTasks(newTasks);
+
+    try {
+      await updateTaskStatusAndOrder(
+        movedTask.id,
+        destination.droppableId,
+        destination.index
+      );
+    } catch (error) {
+      console.error("Failed to update task:", error);
+      // Optionally revert state on failure
     }
   };
 
@@ -75,68 +134,105 @@ const Kanban = () => {
           </button>
         </div>
 
-        <div className="kanban-container">
-          <div className="kanban-column">
-            <div className="add-ticket" title="Add task">
-              <MdAdd />
-            </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="kanban-container">
+            <Droppable droppableId="backlog">
+              {(provided) => (
+                <div
+                  className="kanban-column"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  <div className="add-ticket" title="Add task">
+                    <MdAdd />
+                  </div>
 
-            <span className="status">Backlog</span>
-            {tasks
-              .filter((task) => task.status.toLowerCase() === "backlog")
-              .map((task) => (
-                <KanbanTicket
-                  key={task.id}
-                  task={task}
-                  onDelete={handleDelete}
-                />
-              ))}
+                  <span className="status">Backlog</span>
+                  {tasks
+                    .filter((task) => task.status.toLowerCase() === "backlog")
+                    .sort((a, b) => a.order - b.order) // Sort tasks by order
+                    .map((task, index) => (
+                      <KanbanTicket
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDelete}
+                        index={index}
+                      />
+                    ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+
+            <Droppable droppableId="in progress">
+              {(provided) => (
+                <div
+                  className="kanban-column"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  <div className="add-ticket" title="Add task">
+                    <MdAdd />
+                  </div>
+
+                  <span
+                    className="status"
+                    style={{ backgroundColor: "#DBECFA", color: "#5da9e9" }}
+                  >
+                    In Progress
+                  </span>
+                  {tasks
+                    .filter(
+                      (task) => task.status.toLowerCase() === "in progress"
+                    )
+                    .sort((a, b) => a.order - b.order) // Sort tasks by order
+                    .map((task, index) => (
+                      <KanbanTicket
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDelete}
+                        index={index}
+                      />
+                    ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+
+            <Droppable droppableId="done">
+              {(provided) => (
+                <div
+                  className="kanban-column"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  <div className="add-ticket" title="Add task">
+                    <MdAdd />
+                  </div>
+
+                  <span
+                    className="status"
+                    style={{ backgroundColor: "#EFFADB", color: "#80b918" }}
+                  >
+                    Done
+                  </span>
+                  {tasks
+                    .filter((task) => task.status.toLowerCase() === "done")
+                    .sort((a, b) => a.order - b.order) // Sort tasks by order
+                    .map((task, index) => (
+                      <KanbanTicket
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDelete}
+                        index={index}
+                      />
+                    ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
           </div>
-
-          <div className="kanban-column">
-            <div className="add-ticket" title="Add task">
-              <MdAdd />
-            </div>
-
-            <span
-              className="status"
-              style={{ backgroundColor: "#DBECFA", color: "#5da9e9" }}
-            >
-              In Progress
-            </span>
-            {tasks
-              .filter((task) => task.status.toLowerCase() === "in progress")
-              .map((task) => (
-                <KanbanTicket
-                  key={task.id}
-                  task={task}
-                  onDelete={handleDelete}
-                />
-              ))}
-          </div>
-
-          <div className="kanban-column">
-            <div className="add-ticket" title="Add task">
-              <MdAdd />
-            </div>
-
-            <span
-              className="status"
-              style={{ backgroundColor: "#EFFADB", color: "#80b918" }}
-            >
-              Done
-            </span>
-            {tasks
-              .filter((task) => task.status.toLowerCase() === "done")
-              .map((task) => (
-                <KanbanTicket
-                  key={task.id}
-                  task={task}
-                  onDelete={handleDelete}
-                />
-              ))}
-          </div>
-        </div>
+        </DragDropContext>
       </div>
     </div>
   );

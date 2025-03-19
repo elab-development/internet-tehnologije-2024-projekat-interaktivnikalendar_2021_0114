@@ -22,16 +22,15 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
 
   const fetchSprintsData = async () => {
     try {
-      console.log("Fetching sprints sidebar.");
       const sprintsData = await fetchActiveTeams();
       setSprints(sprintsData);
-      console.log("Sprints fetched successfully.", sprintsData);
     } catch (error) {
       alert("Failed to fetch sprints");
     }
   };
 
   useEffect(() => {
+    console.log("Sidebar sprints data");
     if (location.pathname === "/kanban") {
       fetchSprintsData();
     }
@@ -113,6 +112,7 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
             </NavLink>
           </div>
           <hr />
+
           {setSprintId && (
             <div className="sidebar-section">
               <h3 onClick={toggleTasksCollapse}>

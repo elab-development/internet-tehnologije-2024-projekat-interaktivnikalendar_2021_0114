@@ -47,6 +47,7 @@
 .kanban-column {
     width: 26%;
     height: fit-content;
+    min-height: 8rem;
     padding: 1rem;
     overflow-y: auto;
     position: relative;

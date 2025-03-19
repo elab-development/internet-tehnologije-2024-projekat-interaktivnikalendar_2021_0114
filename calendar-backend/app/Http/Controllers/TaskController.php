@@ -41,6 +41,7 @@ class TaskController extends Controller
             'user_id' => 'required|exists:users,id',
             'sprint_id' => 'required|exists:sprints,id',
             'color' => 'required|string',
+            'priority' => 'nullable|string',
         ]);
 
         $sprint = Sprint::find($validatedData['sprint_id']);
@@ -99,6 +100,7 @@ class TaskController extends Controller
             'user_id' => 'required|exists:users,id',
             'sprint_id' => 'required|exists:sprints,id',
             'color' => 'required|string',
+            'priority' => 'nullable|string',
         ]);
 
         $sprint = Sprint::find($validatedData['sprint_id']);
@@ -120,10 +122,67 @@ class TaskController extends Controller
             'user_id' => $validatedData['user_id'],
             'sprint_id' => $validatedData['sprint_id'],
             'color' => $validatedData['color'],
+            'priority' => $validatedData['priority'] ?? null,
         ]);
 
 
         return response()->json(['message' => 'Task updated successfully.', 'task' => $task], 200);
+    }
+
+    /**
+     * Update the status and order of the specified task.
+     */
+    public function updateStatusAndOrder(Request $request, $task_id)
+    {
+        $task = Task::find($task_id);
+        if (is_null($task)) {
+            return response()->json(['message' => 'Task not found'], 404);
+        }
+
+        $validatedData = $request->validate([
+            'status' => 'required|string',
+            'newIndex' => 'required|integer',
+        ]);
+
+        $newIndex = $validatedData['newIndex'];
+        $oldIndex = $task->order;
+        $newStatus = $validatedData['status'];
+        $oldStatus = $task->status;
+        $sprint_id = $task->sprint_id;
+
+        // Update the order of other tasks in the old column and sprint
+        if ($oldStatus === $newStatus) {
+            if ($newIndex > $oldIndex) {
+                Task::where('status', $oldStatus)
+                    ->where('sprint_id', $sprint_id)
+                    ->where('order', '>', $oldIndex)
+                    ->where('order', '<=', $newIndex)
+                    ->decrement('order', 1);
+            } else {
+                Task::where('status', $oldStatus)
+                    ->where('sprint_id', $sprint_id)
+                    ->where('order', '<', $oldIndex)
+                    ->where('order', '>=', $newIndex)
+                    ->increment('order', 1);
+            }
+        } else {
+            Task::where('status', $oldStatus)
+                ->where('sprint_id', $sprint_id)
+                ->where('order', '>', $oldIndex)
+                ->decrement('order', 1);
+
+            Task::where('status', $newStatus)
+                ->where('sprint_id', $sprint_id)
+                ->where('order', '>=', $newIndex)
+                ->increment('order', 1);
+        }
+
+        $task->update([
+            'status' => $newStatus,
+            'order' => $newIndex,
+        ]);
+
+        return response()->json(['message' => 'Task status and order updated successfully.', 'task' => $task], 200);
     }
 
     /**

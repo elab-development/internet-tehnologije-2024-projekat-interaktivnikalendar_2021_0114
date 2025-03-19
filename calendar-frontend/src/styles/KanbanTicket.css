@@ -24,8 +24,8 @@
 }
 
 .ticket-priority {
-    background-color: var(--red-higlight);
-    color: var(--red);
+    background-color: var(--priority-bg);
+    color: var(--priority-color);
     border-radius: 0.2rem;
     padding: 0 0.2rem;
 }

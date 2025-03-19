@@ -18,6 +18,8 @@ class Task extends Model
         'user_id',
         'sprint_id',
         'color',
+        'priority',
+        'order',
     ];
 
     public function sprint()

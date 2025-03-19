@@ -18,16 +18,6 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
   const [availableSprints, setAvailableSprints] = useState([]);
   const [selectedSprint, setSelectedSprint] = useState(null);
 
-  const fetchAvailableSprints = async () => {
-    try {
-      console.log("Fetching available sprints...");
-      const [sprintsData] = await Promise.all([assignTaskToSprint()]);
-      setAvailableSprints(sprintsData);
-    } catch (error) {
-      alert("Failed to fetch available sprints");
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -35,16 +25,26 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
   };
 
   useEffect(() => {
-    fetchAvailableSprints();
+    let active = true;
+    assignTaskToSprint().then((data) => {
+      if (active) {
+        setAvailableSprints(data);
+        setSelectedSprint(data[0]);
+      }
+    });
+    console.log("Selected sprint", selectedSprint);
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Set selectedSprint to the first sprint in availableSprints
   // TODO: FIND ANOTHER WAY TO IMPLEMENT THIS
-  useEffect(() => {
-    if (!selectedSprint && availableSprints.length > 0) {
-      setSelectedSprint(availableSprints[0]);
-    }
-  }, [availableSprints]);
+  // useEffect(() => {
+  //   if (!selectedSprint && availableSprints.length > 0) {
+  //     setSelectedSprint(availableSprints[0]);
+  //   }
+  // }, [availableSprints]);
 
   useEffect(() => {
     if (selectedTask) {
