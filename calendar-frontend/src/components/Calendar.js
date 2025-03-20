@@ -164,7 +164,7 @@ const Calendar = ({ selectedDate }) => {
   };
 
   const prepareSprintEvents = (sprints) => {
-    // console.log("Sprints:", sprints);
+    console.log("Sprints:", sprints);
     return (Array.isArray(sprints) ? sprints : [])
       .map((sprint) => {
         // Check if the sprint is an array with a success message and the sprint object
@@ -195,23 +195,20 @@ const Calendar = ({ selectedDate }) => {
   };
 
   const prepareTaskEvents = (tasks) => {
-    //console.log("Tasks:", tasks);
+    console.log("Tasks before processing:", tasks);
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
-        // Check if the task is an array with a success message and the task object
-        if (
-          Array.isArray(task) &&
-          task.length === 2 &&
-          typeof task[0] === "string" &&
-          typeof task[1] === "object"
-        ) {
-          task = task[1]; // Extract the task object
+        // Handle case where task is wrapped in a response object
+        if (task && task.task && typeof task.task === "object") {
+          task = task.task; // Extract the actual task object
         }
-
-        if (!task || !task.name || !task.start || !task.end) {
+  
+        // Validate task properties
+        if (!task || typeof task !== "object" || !task.name || !task.start || !task.end) {
           console.error("Invalid task data:", task);
           return null;
         }
+  
         return {
           id: task.id,
           title: task.name,
@@ -230,7 +227,6 @@ const Calendar = ({ selectedDate }) => {
       })
       .filter((event) => event !== null);
   };
-
   // Memoize the events array to prevent unnecessary recalculations on every render
   const events = useMemo(() => {
     return [
