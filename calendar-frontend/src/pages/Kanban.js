@@ -59,9 +59,8 @@ const Kanban = () => {
       return;
     }
 
-    // Find the moved task
     const movedTask = tasks.find((task) => task.id.toString() === draggableId);
-    if (!movedTask) return; // Safety check
+    if (!movedTask) return;
 
     // Create a new array of tasks without mutating the original state
     let newTasks = tasks.map((task) => {
@@ -75,12 +74,12 @@ const Kanban = () => {
       // Adjust order of other tasks in the same column
       if (task.status === source.droppableId) {
         if (task.order > source.index) {
-          return { ...task, order: task.order - 1 }; // Shift order up if below the moved task
+          return { ...task, order: task.order - 1 };
         }
       }
       if (task.status === destination.droppableId) {
         if (task.order >= destination.index) {
-          return { ...task, order: task.order + 1 }; // Shift order down to make space
+          return { ...task, order: task.order + 1 };
         }
       }
       return task;
@@ -89,7 +88,6 @@ const Kanban = () => {
     // Sort by order to maintain correct structure
     newTasks = newTasks.sort((a, b) => a.order - b.order);
 
-    // Update state optimistically
     setTasks(newTasks);
 
     try {
@@ -100,7 +98,6 @@ const Kanban = () => {
       );
     } catch (error) {
       console.error("Failed to update task:", error);
-      // Optionally revert state on failure
     }
   };
 

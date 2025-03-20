@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import "../styles/Form.css";
-import { assignTaskToSprint } from "./api";
+import { useFetchActiveTeams } from "../hooks/teamHooks";
+import axios from "axios";
 
 const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
   const [formData, setFormData] = useState({
@@ -12,11 +12,23 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     status: "",
     user_id: "",
     sprint_id: "",
+    priority: "",
     color: "#90EE90", // Default color light green
   });
 
   const [availableSprints, setAvailableSprints] = useState([]);
   const [selectedSprint, setSelectedSprint] = useState(null);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSelectSprintChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value, user_id: "" });
+    setSelectedSprint(availableSprints.find((sprint) => sprint.id == value));
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -24,58 +36,47 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
   };
 
-  useEffect(() => {
-    let active = true;
-    assignTaskToSprint().then((data) => {
-      if (active) {
-        setAvailableSprints(data);
-        setSelectedSprint(data[0]);
-      }
-    });
-    console.log("Selected sprint", selectedSprint);
-    return () => {
-      active = false;
-    };
-  }, []);
+  function updateTask(selectedTask, formData, token) {
+    axios
+      .put(
+        `http://127.0.0.1:8000/api/tasks/${selectedTask.id}`,
+        { ...formData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        onTaskAdded(response.data);
+        fetchTasks();
+        onClose();
+      })
+      .catch((er) =>
+        alert("Failed to update task: " + er.response.data.message)
+      );
+  }
 
-  // Set selectedSprint to the first sprint in availableSprints
-  // TODO: FIND ANOTHER WAY TO IMPLEMENT THIS
-  // useEffect(() => {
-  //   if (!selectedSprint && availableSprints.length > 0) {
-  //     setSelectedSprint(availableSprints[0]);
-  //   }
-  // }, [availableSprints]);
-
-  useEffect(() => {
-    if (selectedTask) {
-      setFormData({
-        name: selectedTask.title || "",
-        description: selectedTask.extendedProps.description || "",
-        start: formatDate(selectedTask.start),
-        end: formatDate(selectedTask.end),
-        status: selectedTask.extendedProps.status || "",
-        user_id: selectedTask.extendedProps.user_id || "",
-        sprint_id: selectedTask.extendedProps.sprint_id || "",
-        color: selectedTask.color || "#90EE90",
+  function addTask(formData, token) {
+    axios
+      .post(
+        `http://127.0.0.1:8000/api/tasks`,
+        { ...formData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        onTaskAdded(response.data);
+        fetchTasks();
+        onClose();
+      })
+      .catch((er) => {
+        alert("Failed to add task: " + er.response.data.message);
       });
-    } else {
-      setFormData({
-        name: "",
-        description: "",
-        start: "",
-        end: "",
-        status: "",
-        user_id: "",
-        sprint_id: "",
-        color: "#90EE90",
-      });
-    }
-  }, [selectedTask]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -93,123 +94,78 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     }
 
     if (selectedTask) {
-      // Update existing task
-      axios
-        .put(
-          `http://127.0.0.1:8000/api/tasks/${selectedTask.id}`,
-          { ...formData },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          onTaskAdded(response.data);
-          fetchTasks();
-          onClose();
-        })
-        .catch(() => alert("Failed to update task"));
+      updateTask(selectedTask, formData, token);
     } else {
-      axios
-        .post(
-          `http://127.0.0.1:8000/api/tasks`,
-          { ...formData },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          onTaskAdded(response.data);
-          fetchTasks();
-          onClose();
-        })
-        .catch((er) => {
-          alert("Failed to add task: " + er.response.data.message);
-        });
+      addTask(formData, token);
     }
   };
+
+  // Gets available sprints for user to choose from
+  useFetchActiveTeams(setAvailableSprints);
+
+  // Populate form data if we are editing an existing task
+  useEffect(() => {
+    if (selectedTask) {
+      setFormData({
+        name: selectedTask.title || "",
+        description: selectedTask.extendedProps.description || "",
+        start: formatDate(selectedTask.start),
+        end: formatDate(selectedTask.end),
+        status: selectedTask.extendedProps.status || "",
+        user_id: selectedTask.extendedProps.user_id || "",
+        sprint_id: selectedTask.extendedProps.sprint_id || "",
+        priority: selectedTask.extendedProps.priority || "",
+        color: selectedTask.color || "#90EE90",
+      });
+      setSelectedSprint(
+        availableSprints.find(
+          (sprint) => sprint.id == selectedTask.extendedProps.sprint_id
+        )
+      );
+    }
+  }, [availableSprints]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Create Task</h2>
         <form onSubmit={handleSubmit}>
-          <div>
-            <label>Name:</label>
+          <label>
+            Name:
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
+              placeholder="Enter task name"
               required
             />
-          </div>
+          </label>
 
-          <div>
-            <label>Description:</label>
+          <label>
+            Description:
             <input
-              type="text"
+              type="textarea"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
+              placeholder="Enter task description"
             />
-          </div>
+          </label>
 
-          <div>
-            <label>Start Date & Time:</label>
-            <input
-              type="datetime-local"
-              name="start"
-              value={formData.start}
-              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label>End Date & Time:</label>
-            <input
-              type="datetime-local"
-              name="end"
-              value={formData.end}
-              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label>Status:</label>
-            <input
-              type="text"
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label>Sprint:</label>
+          <label>
+            Sprint:
             <select
               name="sprint_id"
-              onChange={handleInputChange}
-              onBlur={() =>
-                setSelectedSprint(
-                  availableSprints.find(
-                    (sprint) => sprint.id == formData.sprint_id
-                  )
-                )
-              }
-              value={formData.sprint_id} // Previously selected sprint when editing
+              value={formData.sprint_id}
+              onChange={handleSelectSprintChange}
               required
             >
+              {!formData.sprint_id && (
+                <option value="" disabled hidden>
+                  Select sprint
+                </option>
+              )}
               {(Array.isArray(availableSprints) ? availableSprints : []).map(
                 (sprint) => {
                   return (
@@ -220,16 +176,55 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
                 }
               )}
             </select>
-          </div>
+          </label>
 
-          <div>
-            <label>User:</label>
-            <select
-              name="user_id"
+          <label>
+            Start:
+            <input
+              type="datetime-local"
+              name="start"
+              value={formData.start}
+              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
               onChange={handleInputChange}
-              value={formData.user_id} // Previously selected user when editing
+              required
+            />
+          </label>
+
+          <label>
+            End:
+            <input
+              type="datetime-local"
+              name="end"
+              value={formData.end}
+              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
+              onChange={handleInputChange}
+              required
+            />
+          </label>
+
+          <label>
+            User:
+            <select
+              type="text"
+              name="user_id"
+              value={formData.user_id}
+              onChange={handleInputChange}
               required
             >
+              {!formData.user_id && selectedSprint && (
+                <option value="" disabled hidden>
+                  Select user
+                </option>
+              )}
+
+              {!selectedSprint && (
+                <option value="" disabled hidden>
+                  Select sprint first
+                </option>
+              )}
+
               {selectedSprint &&
                 (Array.isArray(selectedSprint.users)
                   ? selectedSprint.users
@@ -242,18 +237,54 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
                   );
                 })}
             </select>
+          </label>
+
+          <div>
+            <label>
+              Status:
+              <select
+                type="text"
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+              >
+                <option value="" disabled hidden>
+                  Select status
+                </option>
+                <option value="backlog">Backlog</option>
+                <option value="in progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+            </label>
+
+            <label>
+              Priority:
+              <select
+                type="text"
+                name="priority"
+                value={formData.priority}
+                onChange={handleInputChange}
+              >
+                <option value="" disabled hidden>
+                  Select priority
+                </option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+
+            <div className="form-color">
+              <label>Color:</label>
+              <input
+                type="color"
+                name="color"
+                value={formData.color}
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
 
-          <div className="form-color">
-            <label>Color:</label>
-            <input
-              type="color"
-              name="color"
-              value={formData.color}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
           <button type="submit">Add Task</button>
           <button type="button" className="close-button" onClick={onClose}>
             Cancel
