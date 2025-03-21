@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Sprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class SprintController extends Controller
 {
@@ -37,6 +38,10 @@ class SprintController extends Controller
             'end' => 'required|date|after_or_equal:start',
             'color' => 'required|string', // Validate color
         ]);
+
+        // Parse dates in the Europe/Belgrade timezone and set start and end times
+        $validatedData['start'] = Carbon::parse($validatedData['start'])->startOfDay();
+        $validatedData['end'] = Carbon::parse($validatedData['end'])->endOfDay();
 
         $sprint = Sprint::create($validatedData);
 
@@ -86,14 +91,11 @@ class SprintController extends Controller
             'color' => 'required|string', // Validate color
         ]);
 
+        // Parse dates in the Europe/Belgrade timezone and set start and end times
+        $validatedData['start'] = Carbon::parse($validatedData['start'])->startOfDay();
+        $validatedData['end'] = Carbon::parse($validatedData['end'])->endOfDay();
 
-        $sprint->update([
-            'name' => $validatedData['name'],
-            'start' => $validatedData['start'],
-            'end' => $validatedData['end'],
-            'color' => $validatedData['color'], // Update color
-        ]);
-
+        $sprint->update($validatedData);
 
         return response()->json(['message' => 'Sprint updated successfully.', 'sprint' => $sprint], 200);
     }
@@ -115,9 +117,10 @@ class SprintController extends Controller
     {
         $user = $request->user();
         $sprints = $user->sprints()->with('users.role')->get(); // Include user roles
+
         return response()->json($sprints);
     }
- 
+
     //Ovo smo koristi pre nego sto smo kreirali invitationForm
     public function assignUserToSprint($sprint_id, $user_id)
     {

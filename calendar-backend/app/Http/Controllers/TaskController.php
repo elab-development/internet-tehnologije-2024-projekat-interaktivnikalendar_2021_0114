@@ -7,6 +7,7 @@ use App\Models\Sprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\TaskResource;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -49,8 +50,14 @@ class TaskController extends Controller
             return response()->json(['message' => 'Sprint not found'], 404);
         }
 
+        // Normalize dates for comparison
+        $taskStart = Carbon::parse($validatedData['start'])->startOfMinute();
+        $taskEnd = Carbon::parse($validatedData['end'])->endOfMinute();
+        $sprintStart = Carbon::parse($sprint->start)->startOfMinute();
+        $sprintEnd = Carbon::parse($sprint->end)->endOfMinute();
+
         // Check if the task's start and end dates are within the sprint's start and end dates
-        if ($validatedData['start'] < $sprint->start || $validatedData['end'] > $sprint->end) {
+        if ($taskStart->lt($sprintStart) || $taskEnd->gt($sprintEnd)) {
             return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
         }
 
@@ -108,23 +115,18 @@ class TaskController extends Controller
             return response()->json(['message' => 'Sprint not found'], 404);
         }
 
+        // Normalize dates for comparison
+        $taskStart = Carbon::parse($validatedData['start'])->startOfMinute();
+        $taskEnd = Carbon::parse($validatedData['end'])->endOfMinute();
+        $sprintStart = Carbon::parse($sprint->start)->startOfMinute();
+        $sprintEnd = Carbon::parse($sprint->end)->endOfMinute();
+
         // Check if the task's start and end dates are within the sprint's start and end dates
-        if ($validatedData['start'] < $sprint->start || $validatedData['end'] > $sprint->end) {
+        if ($taskStart->lt($sprintStart) || $taskEnd->gt($sprintEnd)) {
             return response()->json(['message' => 'Task dates must be within the sprint dates'], 422);
         }
 
-        $task->update([
-            'name' => $validatedData['name'],
-            'description' => $validatedData['description'] ?? null,
-            'start' => $validatedData['start'] ?? null,
-            'end' => $validatedData['end'] ?? null,
-            'status' => $validatedData['status'],
-            'user_id' => $validatedData['user_id'],
-            'sprint_id' => $validatedData['sprint_id'],
-            'color' => $validatedData['color'],
-            'priority' => $validatedData['priority'] ?? null,
-        ]);
-
+        $task->update($validatedData);
 
         return response()->json(['message' => 'Task updated successfully.', 'task' => $task], 200);
     }
