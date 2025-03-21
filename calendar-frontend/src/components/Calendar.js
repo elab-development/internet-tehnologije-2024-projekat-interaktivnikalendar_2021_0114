@@ -164,23 +164,14 @@ const Calendar = ({ selectedDate }) => {
   };
 
   const prepareSprintEvents = (sprints) => {
-    console.log("Sprints:", sprints);
+    //console.log("Sprints from database:", sprints);
     return (Array.isArray(sprints) ? sprints : [])
       .map((sprint) => {
-        // Check if the sprint is an array with a success message and the sprint object
-        if (
-          Array.isArray(sprint) &&
-          sprint.length === 2 &&
-          typeof sprint[0] === "string" &&
-          typeof sprint[1] === "object"
-        ) {
-          sprint = sprint[1]; // Extract the sprint object
+        // Handle case where sprint is wrapped in a response object
+        if (sprint && sprint.sprint && typeof sprint.sprint === "object") {
+          sprint = sprint.sprint; // Extract the actual sprint object
         }
-
-        if (!sprint || !sprint.name || !sprint.start || !sprint.end) {
-          console.error("Invalid sprint data:", sprint);
-          return null;
-        }
+  
         return {
           id: sprint.id,
           title: sprint.name,
@@ -193,20 +184,17 @@ const Calendar = ({ selectedDate }) => {
       })
       .filter((event) => event !== null);
   };
+  
+
 
   const prepareTaskEvents = (tasks) => {
-    console.log("Tasks before processing:", tasks);
+  
+    //console.log("Tasks before processing:", tasks);
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
         // Handle case where task is wrapped in a response object
         if (task && task.task && typeof task.task === "object") {
           task = task.task; // Extract the actual task object
-        }
-  
-        // Validate task properties
-        if (!task || typeof task !== "object" || !task.name || !task.start || !task.end) {
-          console.error("Invalid task data:", task);
-          return null;
         }
   
         return {
@@ -227,6 +215,7 @@ const Calendar = ({ selectedDate }) => {
       })
       .filter((event) => event !== null);
   };
+  
   // Memoize the events array to prevent unnecessary recalculations on every render
   const events = useMemo(() => {
     return [
@@ -241,12 +230,13 @@ const Calendar = ({ selectedDate }) => {
       setSelectedSprint({
         id: info.event.id,
         title: info.event.title,
-        start: convertToLocalDate(info.event.start),
-        end: convertToLocalDate(info.event.end),
+        start: info.event.start,
+        end: info.event.end,
         color: info.event.backgroundColor,
       });
       setShowSprintDetails(true);
       setShowTaskDetails(false);
+      //console.log("Selected sprint", selectedSprint);
     }
 
     if (info.event.extendedProps.type === "task") {
@@ -260,6 +250,7 @@ const Calendar = ({ selectedDate }) => {
       });
       setShowTaskDetails(true);
       setShowSprintDetails(false);
+      //console.log("Selected task", selectedTask);
     }
   };
 
@@ -281,7 +272,8 @@ const Calendar = ({ selectedDate }) => {
           : formatDateTimeForTask(end),
       color: backgroundColor,
     };
-
+    console.log("Updated data", updatedData); 
+    
     if (extendedProps.type === "task") {
       updatedData = {
         ...updatedData,

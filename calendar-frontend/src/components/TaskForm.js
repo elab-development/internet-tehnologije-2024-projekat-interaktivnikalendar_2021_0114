@@ -36,6 +36,16 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
   };
 
+  const formatDateForSprints = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+
+    // Prilagodi datum tako da se ne menja vremenska zona
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
+    return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+};
+
   function updateTask(selectedTask, formData, token) {
     axios
       .put(
@@ -102,6 +112,7 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
 
   // Gets available sprints for user to choose from
   useFetchActiveTeams(setAvailableSprints);
+  console.log("Avaliable sprints",availableSprints);
 
   // Populate form data if we are editing an existing task
   useEffect(() => {
@@ -117,11 +128,12 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
         priority: selectedTask.extendedProps.priority || "",
         color: selectedTask.color || "#90EE90",
       });
-      setSelectedSprint(
-        availableSprints.find(
-          (sprint) => sprint.id == selectedTask.extendedProps.sprint_id
-        )
+  
+      const sprint = availableSprints.find(
+        (sprint) => sprint.id == selectedTask.extendedProps.sprint_id
       );
+      setSelectedSprint(sprint);
+
     }
   }, [availableSprints]);
 
@@ -184,12 +196,14 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               type="datetime-local"
               name="start"
               value={formData.start}
-              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
+              min={selectedSprint ? formatDateForSprints(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDateForSprints(selectedSprint.end) : ""}
               onChange={handleInputChange}
               required
             />
+            
           </label>
+          
 
           <label>
             End:
@@ -197,8 +211,8 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
               type="datetime-local"
               name="end"
               value={formData.end}
-              min={selectedSprint ? formatDate(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDate(selectedSprint.end) : ""}
+              min={selectedSprint ? formatDateForSprints(selectedSprint.start) : ""}
+              max={selectedSprint ? formatDateForSprints(selectedSprint.end) : ""}
               onChange={handleInputChange}
               required
             />

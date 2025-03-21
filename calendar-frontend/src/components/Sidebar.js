@@ -30,13 +30,12 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
   };
 
   useEffect(() => {
-    console.log("Sidebar sprints data");
     if (location.pathname === "/kanban") {
       fetchSprintsData();
     }
   }, [location.pathname]);
 
-  const toggleTasksCollapse = () => {
+  const toggleSprintCollapse = () => {
     setIsSprintsCollapsed(!isSprintsCollapsed);
   };
 
@@ -115,7 +114,7 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
 
           {setSprintId && (
             <div className="sidebar-section">
-              <h3 onClick={toggleTasksCollapse}>
+              <h3 onClick={toggleSprintCollapse}>
                 Sprints
                 {isSprintsCollapsed ? (
                   <IoIosArrowBack className="arrow-icon" />

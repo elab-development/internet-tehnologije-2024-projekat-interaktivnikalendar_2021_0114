@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Form.css";
+import { formatDateForSprint } from "./utils";
 
 const SprintForm = ({
   selectedSprint,
@@ -15,18 +16,13 @@ const SprintForm = ({
     color: "#0B0BFF", // Default color
   });
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-  };
 
   useEffect(() => {
     if (selectedSprint) {
       setFormData({
         name: selectedSprint.title || "",
-        start: formatDate(selectedSprint.start),
-        end: formatDate(selectedSprint.end),
+        start: formatDateForSprint(selectedSprint.start),
+        end: formatDateForSprint(selectedSprint.end),
         color: selectedSprint.color || "#0B0BFF",
       });
     } else {
@@ -38,6 +34,7 @@ const SprintForm = ({
       });
     }
   }, [selectedSprint]);
+  //console.log(selectedSprint);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
