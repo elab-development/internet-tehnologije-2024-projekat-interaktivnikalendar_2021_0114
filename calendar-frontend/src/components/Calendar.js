@@ -171,7 +171,7 @@ const Calendar = ({ selectedDate }) => {
         if (sprint && sprint.sprint && typeof sprint.sprint === "object") {
           sprint = sprint.sprint; // Extract the actual sprint object
         }
-  
+
         return {
           id: sprint.id,
           title: sprint.name,
@@ -184,11 +184,8 @@ const Calendar = ({ selectedDate }) => {
       })
       .filter((event) => event !== null);
   };
-  
-
 
   const prepareTaskEvents = (tasks) => {
-  
     //console.log("Tasks before processing:", tasks);
     return (Array.isArray(tasks) ? tasks : [])
       .map((task) => {
@@ -196,7 +193,7 @@ const Calendar = ({ selectedDate }) => {
         if (task && task.task && typeof task.task === "object") {
           task = task.task; // Extract the actual task object
         }
-  
+
         return {
           id: task.id,
           title: task.name,
@@ -210,12 +207,13 @@ const Calendar = ({ selectedDate }) => {
             status: task.status,
             user_id: task.user_id,
             sprint_id: task.sprint_id,
+            priority: task.priority,
           },
         };
       })
       .filter((event) => event !== null);
   };
-  
+
   // Memoize the events array to prevent unnecessary recalculations on every render
   const events = useMemo(() => {
     return [
@@ -272,8 +270,8 @@ const Calendar = ({ selectedDate }) => {
           : formatDateTimeForTask(end),
       color: backgroundColor,
     };
-    console.log("Updated data", updatedData); 
-    
+    console.log("Updated data", updatedData);
+
     if (extendedProps.type === "task") {
       updatedData = {
         ...updatedData,
@@ -382,7 +380,6 @@ const Calendar = ({ selectedDate }) => {
         <TaskForm
           selectedTask={isEditing ? selectedTask : null}
           onTaskAdded={handleTaskAdded}
-          fetchTasks={fetchTasks}
           onClose={() => {
             setShowTaskDetails(false);
             setShowTaskForm(false);

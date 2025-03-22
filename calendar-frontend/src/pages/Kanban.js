@@ -10,11 +10,18 @@ import {
 } from "../components/api";
 import { MdAdd } from "react-icons/md";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import TaskForm from "../components/TaskForm";
 
 const Kanban = () => {
   const [tasks, setTasks] = useState([]);
   const [selectedView, setSelectedView] = useState("personal");
   const [sprintId, setSprintId] = useState(null);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+
+  // Tells task form to make a new task but we use this because we need state to be filled in when opening the form
+  const [isNewKanbanTask, setIsNewKanbanTask] = useState(false);
 
   useEffect(() => {
     const getTasks = async () => {
@@ -36,7 +43,7 @@ const Kanban = () => {
     if (sprintId) {
       getTasks();
     }
-  }, [sprintId, selectedView]);
+  }, [sprintId, selectedView, refresh]);
 
   const handleDelete = async (taskId) => {
     try {
@@ -45,6 +52,32 @@ const Kanban = () => {
     } catch (error) {
       alert("Failed to delete task");
     }
+  };
+
+  const handleTaskAdded = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setShowTaskForm(false);
+    setRefresh((prev) => !prev);
+  };
+
+  const handleEditTask = (taskId) => {
+    const taskToEdit = tasks.find((task) => task.id === taskId);
+    setSelectedTask({
+      id: taskToEdit.id,
+      title: taskToEdit.name,
+      start: taskToEdit.start,
+      end: taskToEdit.end,
+      color: taskToEdit.color,
+      extendedProps: {
+        description: taskToEdit.description,
+        status: taskToEdit.status,
+        user_id: taskToEdit.user_id,
+        sprint_id: taskToEdit.sprint_id,
+        priority: taskToEdit.priority,
+      },
+    });
+    setIsNewKanbanTask(false);
+    setShowTaskForm(true);
   };
 
   const onDragEnd = async (result) => {
@@ -140,19 +173,36 @@ const Kanban = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  <div className="add-ticket" title="Add task">
+                  <div
+                    className="add-ticket"
+                    title="Add task"
+                    onClick={() => {
+                      setSelectedTask({
+                        extendedProps: {
+                          status: "backlog",
+                          sprint_id: sprintId || "",
+                        },
+                      });
+                      setShowTaskForm(true);
+                      setIsNewKanbanTask(true);
+                    }}
+                  >
                     <MdAdd />
                   </div>
 
                   <span className="status">Backlog</span>
                   {tasks
-                    .filter((task) => task.status.toLowerCase() === "backlog")
+                    .filter(
+                      (task) =>
+                        task.status && task.status.toLowerCase() === "backlog"
+                    )
                     .sort((a, b) => a.order - b.order) // Sort tasks by order
                     .map((task, index) => (
                       <KanbanTicket
                         key={task.id}
                         task={task}
                         onDelete={handleDelete}
+                        onEdit={handleEditTask}
                         index={index}
                       />
                     ))}
@@ -168,7 +218,20 @@ const Kanban = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  <div className="add-ticket" title="Add task">
+                  <div
+                    className="add-ticket"
+                    title="Add task"
+                    onClick={() => {
+                      setSelectedTask({
+                        extendedProps: {
+                          status: "in progress",
+                          sprint_id: sprintId || "",
+                        },
+                      });
+                      setShowTaskForm(true);
+                      setIsNewKanbanTask(true);
+                    }}
+                  >
                     <MdAdd />
                   </div>
 
@@ -180,7 +243,9 @@ const Kanban = () => {
                   </span>
                   {tasks
                     .filter(
-                      (task) => task.status.toLowerCase() === "in progress"
+                      (task) =>
+                        task.status &&
+                        task.status.toLowerCase() === "in progress"
                     )
                     .sort((a, b) => a.order - b.order) // Sort tasks by order
                     .map((task, index) => (
@@ -188,6 +253,7 @@ const Kanban = () => {
                         key={task.id}
                         task={task}
                         onDelete={handleDelete}
+                        onEdit={handleEditTask}
                         index={index}
                       />
                     ))}
@@ -203,7 +269,20 @@ const Kanban = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  <div className="add-ticket" title="Add task">
+                  <div
+                    className="add-ticket"
+                    title="Add task"
+                    onClick={() => {
+                      setSelectedTask({
+                        extendedProps: {
+                          status: "done",
+                          sprint_id: sprintId || "",
+                        },
+                      });
+                      setShowTaskForm(true);
+                      setIsNewKanbanTask(true);
+                    }}
+                  >
                     <MdAdd />
                   </div>
 
@@ -214,13 +293,17 @@ const Kanban = () => {
                     Done
                   </span>
                   {tasks
-                    .filter((task) => task.status.toLowerCase() === "done")
+                    .filter(
+                      (task) =>
+                        task.status && task.status.toLowerCase() === "done"
+                    )
                     .sort((a, b) => a.order - b.order) // Sort tasks by order
                     .map((task, index) => (
                       <KanbanTicket
                         key={task.id}
                         task={task}
                         onDelete={handleDelete}
+                        onEdit={handleEditTask}
                         index={index}
                       />
                     ))}
@@ -231,6 +314,17 @@ const Kanban = () => {
           </div>
         </DragDropContext>
       </div>
+
+      {showTaskForm && (
+        <TaskForm
+          selectedTask={selectedTask}
+          onTaskAdded={handleTaskAdded}
+          onClose={() => {
+            setShowTaskForm(false);
+          }}
+          newKanbanTask={isNewKanbanTask}
+        />
+      )}
     </div>
   );
 };

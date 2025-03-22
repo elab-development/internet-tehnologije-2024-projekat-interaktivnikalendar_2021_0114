@@ -2,7 +2,7 @@ import "../styles/KanbanTicket.css";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { Draggable } from "@hello-pangea/dnd";
 
-const KanbanTicket = ({ task, onDelete, index }) => {
+const KanbanTicket = ({ task, onDelete, onEdit, index }) => {
   const formatDate = (dateString) => {
     const options = {
       day: "2-digit",
@@ -68,7 +68,11 @@ const KanbanTicket = ({ task, onDelete, index }) => {
           </div>
 
           <div className="ticket-actions">
-            <MdEdit className="ticket-button" title="Edit" />
+            <MdEdit
+              className="ticket-button"
+              title="Edit"
+              onClick={() => onEdit(task.id)}
+            />
             <MdDelete
               className="ticket-button"
               title="Delete"

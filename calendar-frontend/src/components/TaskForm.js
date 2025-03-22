@@ -2,8 +2,14 @@ import { useEffect, useState } from "react";
 import "../styles/Form.css";
 import { useFetchActiveTeams } from "../hooks/teamHooks";
 import axios from "axios";
+import { fetchTasks } from "./api";
 
-const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
+const TaskForm = ({
+  selectedTask,
+  onTaskAdded,
+  onClose,
+  newKanbanTask = false,
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -41,10 +47,12 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
     const date = new Date(dateString);
 
     // Prilagodi datum tako da se ne menja vremenska zona
-    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
 
     return localDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-};
+  };
 
   function updateTask(selectedTask, formData, token) {
     axios
@@ -103,7 +111,9 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
       return;
     }
 
-    if (selectedTask) {
+    if (newKanbanTask) {
+      addTask(formData, token);
+    } else if (selectedTask) {
       updateTask(selectedTask, formData, token);
     } else {
       addTask(formData, token);
@@ -112,7 +122,6 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
 
   // Gets available sprints for user to choose from
   useFetchActiveTeams(setAvailableSprints);
-  console.log("Avaliable sprints",availableSprints);
 
   // Populate form data if we are editing an existing task
   useEffect(() => {
@@ -120,182 +129,203 @@ const TaskForm = ({ selectedTask, onTaskAdded, fetchTasks, onClose }) => {
       setFormData({
         name: selectedTask.title || "",
         description: selectedTask.extendedProps.description || "",
-        start: formatDate(selectedTask.start),
-        end: formatDate(selectedTask.end),
+        start: formatDate(selectedTask.start) || "",
+        end: formatDate(selectedTask.end) || "",
         status: selectedTask.extendedProps.status || "",
         user_id: selectedTask.extendedProps.user_id || "",
         sprint_id: selectedTask.extendedProps.sprint_id || "",
         priority: selectedTask.extendedProps.priority || "",
         color: selectedTask.color || "#90EE90",
       });
-  
+
       const sprint = availableSprints.find(
         (sprint) => sprint.id == selectedTask.extendedProps.sprint_id
       );
       setSelectedSprint(sprint);
-
     }
   }, [availableSprints]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-content task-form"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2>Create Task</h2>
         <form onSubmit={handleSubmit}>
-          <label>
-            Name:
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter task name"
-              required
-            />
-          </label>
+          <div className="task-form-fields">
+            <div className="task-form-container">
+              <label>
+                Name:
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter task name"
+                  required
+                />
+              </label>
 
-          <label>
-            Description:
-            <input
-              type="textarea"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Enter task description"
-            />
-          </label>
+              <label>
+                Description:
+                <input
+                  type="textarea"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Enter task description"
+                />
+              </label>
 
-          <label>
-            Sprint:
-            <select
-              name="sprint_id"
-              value={formData.sprint_id}
-              onChange={handleSelectSprintChange}
-              required
-            >
-              {!formData.sprint_id && (
-                <option value="" disabled hidden>
-                  Select sprint
-                </option>
-              )}
-              {(Array.isArray(availableSprints) ? availableSprints : []).map(
-                (sprint) => {
-                  return (
-                    <option key={sprint.id} value={sprint.id}>
-                      {sprint.name}
+              <label>
+                Sprint:
+                <select
+                  name="sprint_id"
+                  value={formData.sprint_id}
+                  onChange={handleSelectSprintChange}
+                  required
+                >
+                  {!formData.sprint_id && (
+                    <option value="" disabled hidden>
+                      Select sprint
                     </option>
-                  );
-                }
-              )}
-            </select>
-          </label>
+                  )}
+                  {(Array.isArray(availableSprints)
+                    ? availableSprints
+                    : []
+                  ).map((sprint) => {
+                    return (
+                      <option key={sprint.id} value={sprint.id}>
+                        {sprint.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
 
-          <label>
-            Start:
-            <input
-              type="datetime-local"
-              name="start"
-              value={formData.start}
-              min={selectedSprint ? formatDateForSprints(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDateForSprints(selectedSprint.end) : ""}
-              onChange={handleInputChange}
-              required
-            />
-            
-          </label>
-          
+              <label>
+                Start:
+                <input
+                  type="datetime-local"
+                  name="start"
+                  value={formData.start}
+                  min={
+                    selectedSprint
+                      ? formatDateForSprints(selectedSprint.start)
+                      : ""
+                  }
+                  max={
+                    selectedSprint
+                      ? formatDateForSprints(selectedSprint.end)
+                      : ""
+                  }
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
 
-          <label>
-            End:
-            <input
-              type="datetime-local"
-              name="end"
-              value={formData.end}
-              min={selectedSprint ? formatDateForSprints(selectedSprint.start) : ""}
-              max={selectedSprint ? formatDateForSprints(selectedSprint.end) : ""}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
+              <label>
+                End:
+                <input
+                  type="datetime-local"
+                  name="end"
+                  value={formData.end}
+                  min={
+                    selectedSprint
+                      ? formatDateForSprints(selectedSprint.start)
+                      : ""
+                  }
+                  max={
+                    selectedSprint
+                      ? formatDateForSprints(selectedSprint.end)
+                      : ""
+                  }
+                  onChange={handleInputChange}
+                  required
+                />
+              </label>
 
-          <label>
-            User:
-            <select
-              type="text"
-              name="user_id"
-              value={formData.user_id}
-              onChange={handleInputChange}
-              required
-            >
-              {!formData.user_id && selectedSprint && (
-                <option value="" disabled hidden>
-                  Select user
-                </option>
-              )}
-
-              {!selectedSprint && (
-                <option value="" disabled hidden>
-                  Select sprint first
-                </option>
-              )}
-
-              {selectedSprint &&
-                (Array.isArray(selectedSprint.users)
-                  ? selectedSprint.users
-                  : []
-                ).map((user) => {
-                  return (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
+              <label>
+                User:
+                <select
+                  type="text"
+                  name="user_id"
+                  value={formData.user_id}
+                  onChange={handleInputChange}
+                  required
+                >
+                  {!formData.user_id && selectedSprint && (
+                    <option value="" disabled hidden>
+                      Select user
                     </option>
-                  );
-                })}
-            </select>
-          </label>
+                  )}
 
-          <div>
-            <label>
-              Status:
-              <select
-                type="text"
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-              >
-                <option value="" disabled hidden>
-                  Select status
-                </option>
-                <option value="backlog">Backlog</option>
-                <option value="in progress">In Progress</option>
-                <option value="done">Done</option>
-              </select>
-            </label>
+                  {!selectedSprint && (
+                    <option value="" disabled hidden>
+                      Select sprint first
+                    </option>
+                  )}
 
-            <label>
-              Priority:
-              <select
-                type="text"
-                name="priority"
-                value={formData.priority}
-                onChange={handleInputChange}
-              >
-                <option value="" disabled hidden>
-                  Select priority
-                </option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </label>
+                  {selectedSprint &&
+                    (Array.isArray(selectedSprint.users)
+                      ? selectedSprint.users
+                      : []
+                    ).map((user) => {
+                      return (
+                        <option key={user.id} value={user.id}>
+                          {user.name}
+                        </option>
+                      );
+                    })}
+                </select>
+              </label>
+            </div>
 
-            <div className="form-color">
-              <label>Color:</label>
-              <input
-                type="color"
-                name="color"
-                value={formData.color}
-                onChange={handleInputChange}
-              />
+            <div className="task-form-container">
+              <label>
+                Status:
+                <select
+                  type="text"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled hidden>
+                    Select status
+                  </option>
+                  <option value="backlog">Backlog</option>
+                  <option value="in progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </label>
+
+              <label>
+                Priority:
+                <select
+                  type="text"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled hidden>
+                    Select priority
+                  </option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </label>
+
+              <div className="form-color">
+                <label>Color:</label>
+                <input
+                  type="color"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
           </div>
 

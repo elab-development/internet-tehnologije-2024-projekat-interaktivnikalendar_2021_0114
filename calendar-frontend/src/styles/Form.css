@@ -30,9 +30,18 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 1rem;
   margin-bottom: 10px;
   box-sizing: border-box;
+  color: var(--dark-grey);
+}
+
+.modal-content label {
+  font-size: 1rem;
+}
+
+.modal-content input::placeholder {
+  color: var(--dark-grey);
 }
 
 /* Stilizacija dugmadi */
@@ -42,7 +51,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   transition: background 0.3s ease;
 }
 
@@ -115,4 +124,20 @@ button {
   padding: 8px 12px;
   border: none;
   cursor: pointer;
+}
+
+/* Specific to TaskForm */
+.task-form {
+  width: 40vw;
+}
+
+.task-form-fields {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 2rem;
+}
+
+.task-form-container {
+  width: 50%;
 }
