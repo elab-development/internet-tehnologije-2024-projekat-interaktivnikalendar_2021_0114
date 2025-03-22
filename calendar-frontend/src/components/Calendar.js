@@ -180,6 +180,7 @@ const Calendar = ({ selectedDate }) => {
           backgroundColor: sprint.color,
           borderColor: sprint.color,
           extendedProps: { type: "sprint" },
+          allDay: true,
         };
       })
       .filter((event) => event !== null);

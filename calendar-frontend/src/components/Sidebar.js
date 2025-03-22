@@ -24,6 +24,8 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
     try {
       const sprintsData = await fetchActiveTeams();
       setSprints(sprintsData);
+      setSelectedSprint(sprintsData[0].id);
+      setSprintId(sprintsData[0].id);
     } catch (error) {
       alert("Failed to fetch sprints");
     }
@@ -122,7 +124,6 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
                   <IoIosArrowDown className="arrow-icon" />
                 )}
               </h3>
-              {/* TODO: Style checkboxes */}
               {!isSprintsCollapsed &&
                 sprints.map((sprint) => (
                   <label
