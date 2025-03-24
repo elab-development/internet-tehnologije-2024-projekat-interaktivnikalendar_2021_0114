@@ -90,3 +90,50 @@
 .add-event-menu li:hover {
     background-color: var(--grey-v2);
 }
+
+/* FullCalendar */
+.calendar-container>.fc {
+    --fc-button-bg-color: var(--grey-v2);
+    --fc-button-border-color: var(--grey-v2);
+    --fc-button-text-color: var(--black);
+    --fc-button-hover-bg-color: var(--rich-yellow);
+    --fc-button-active-bg-color: var(--rich-yellow);
+    --fc-button-hover-border-color: var(--rich-yellow);
+    --fc-button-active-border-color: var(--rich-yellow);
+    --fc-highlight-color: var(--grey-v2);
+
+    --fc-today-bg-color: var(--red-higlight);
+}
+
+.calendar-container>.fc .fc-button {
+    font-size: 0.8rem;
+}
+
+.calendar-container>.fc .fc-button:focus {
+    background-color: var(--fc-button-hover-bg-color);
+    border-color: var(--fc-button-hover-border-color);
+    box-shadow: none !important;
+}
+
+.calendar-container>.fc .fc-toolbar-title {
+    font-weight: 600;
+    font-size: 1.6rem;
+}
+
+.calendar-container>.fc th {
+    font-weight: 600;
+}
+
+.calendar-container>.fc table {
+    font-size: 0.9rem;
+}
+
+/* Todays date */
+.calendar-container>.fc .fc-daygrid-day.fc-day-today .fc-scrollgrid-sync-inner .fc-daygrid-day-top .fc-daygrid-day-number {
+    background-color: var(--red);
+    color: var(--white);
+    border-radius: 0.4rem;
+    margin-top: 0.1rem;
+    margin-right: 0.1rem;
+    padding: 0.1rem 0.2rem;
+}

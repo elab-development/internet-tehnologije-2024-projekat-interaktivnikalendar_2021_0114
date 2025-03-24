@@ -62,3 +62,9 @@
 .ticket-button:hover {
     background: var(--grey-v2);
 }
+
+@media (max-width: 576px) {
+    .ticket-container {
+        white-space: nowrap;
+    }
+}

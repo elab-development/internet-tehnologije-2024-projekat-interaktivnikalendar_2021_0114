@@ -85,10 +85,22 @@
     text-align: right;
     margin-top: -0.8rem;
     margin-bottom: 1rem;
-    font-size: 1vw;
+    font-size: 0.9rem;
     text-decoration: none;
 }
 
 .login-card p>a {
     color: var(--rich-yellow);
+}
+
+@media (max-width: 576px) {
+    .login-card {
+        width: 70vw;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 900px) {
+    .login-card {
+        width: 50vw;
+    }
 }

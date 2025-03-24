@@ -7,7 +7,7 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex" }} className="calendar-page">
       <Sidebar setSelectedDate={setSelectedDate} />
       <Calendar selectedDate={selectedDate} />
     </div>

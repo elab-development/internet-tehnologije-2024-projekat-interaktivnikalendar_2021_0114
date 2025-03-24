@@ -20,7 +20,7 @@ const Kanban = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [refresh, setRefresh] = useState(false);
 
-  // Tells task form to make a new task but we use this because we need state to be filled in when opening the form
+  // Tells task form to make a new task but we use this because we need status and sprint_id to be filled in when opening the form
   const [isNewKanbanTask, setIsNewKanbanTask] = useState(false);
 
   useEffect(() => {

@@ -1,7 +1,12 @@
 import "../styles/Sidebar.css";
 import { MdLogout } from "react-icons/md";
 import { IoIosArrowDown, IoIosArrowBack } from "react-icons/io";
-import { BsKanban, BsCalendar } from "react-icons/bs";
+import {
+  BsKanban,
+  BsCalendar,
+  BsJustify,
+  BsChevronDoubleLeft,
+} from "react-icons/bs";
 import { IoSettingsOutline, IoPeople } from "react-icons/io5";
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -24,8 +29,8 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
     try {
       const sprintsData = await fetchActiveTeams();
       setSprints(sprintsData);
-      setSelectedSprint(sprintsData[0].id);
-      setSprintId(sprintsData[0].id);
+      setSelectedSprint(sprintsData[0]?.id);
+      setSprintId(sprintsData[0]?.id);
     } catch (error) {
       alert("Failed to fetch sprints");
     }
@@ -69,10 +74,57 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
     if (setSprintId) setSprintId(sprintId);
   };
 
+  const showSideBar = () => {
+    const sidebar = document.querySelector(".sidebar-container");
+    const icon = document.querySelector("#show-sidebar-icon");
+    if (sidebar && icon) {
+      sidebar.style.display = "grid";
+      icon.style.display = "none";
+      // Trigger a resize event on the FullCalendar component
+      const calendar = document.querySelector(".fc");
+      if (calendar) {
+        window.dispatchEvent(new Event("resize"));
+      }
+    }
+  };
+
+  const hideSideBar = () => {
+    const sidebar = document.querySelector(".sidebar-container");
+    const show_icon = document.querySelector("#show-sidebar-icon");
+    if (sidebar && show_icon) {
+      sidebar.style.display = "none";
+      show_icon.style.display = "block";
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const sidebar = document.querySelector(".sidebar-container");
+      const icon = document.querySelector("#show-sidebar-icon");
+      if (window.innerWidth > 576 && sidebar.style.display === "none") {
+        if (sidebar && icon) {
+          sidebar.style.display = "grid";
+          icon.style.display = "none";
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="sidebar-wrapper">
+      <BsJustify id="show-sidebar-icon" onClick={() => showSideBar()} />
       <div className="sidebar-container">
         <div className="small-calendar">
+          <div id="hide-sidebar-icon">
+            <BsChevronDoubleLeft
+              onClick={() => hideSideBar()}
+              title="Hide sidebar"
+            />
+          </div>
+
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
@@ -96,7 +148,7 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
         </div>
 
         <div className="sidebar-sections">
-          <div>
+          <div className="sidebar-pages">
             <NavLink to="/calendar" className="icon-and-link">
               <BsCalendar className="sidebar-icon" />
               Calendar

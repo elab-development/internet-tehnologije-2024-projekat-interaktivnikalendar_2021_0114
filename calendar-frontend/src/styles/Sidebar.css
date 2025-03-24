@@ -3,9 +3,8 @@
 }
 
 .sidebar-container {
-    /* width: 16vw; */
     width: 15rem;
-    height: 100vh;
+    height: 100%;
     background-color: var(--grey);
     padding: 0 1rem;
     display: grid;
@@ -131,10 +130,11 @@
 .sidebar-sections {
     display: flex;
     flex-direction: column;
+    font-size: 0.8rem;
 }
 
 .sidebar-section h3 {
-    font-size: 1vw;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--dark-grey);
     padding-left: 0.2rem;
@@ -148,8 +148,7 @@
     padding-left: 0.2rem;
     display: flex;
     align-items: center;
-    font-size: 1vw;
-    /* font-size: 0.92rem; */
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--dark-grey);
     text-decoration: none;
@@ -185,7 +184,7 @@
 }
 
 #log-out-section {
-    font-size: 1vw;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--red);
     padding-left: 0.2rem;
@@ -227,4 +226,66 @@ hr {
 .filter-item:hover {
     background-color: var(--grey-v2);
     border-radius: 4px;
+}
+
+#show-sidebar-icon {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    font-size: 1.4rem;
+    fill: var(--dark-grey);
+    top: 1rem;
+    left: 1rem;
+}
+
+#hide-sidebar-icon {
+    display: none;
+}
+
+@media (max-width: 576px) {
+    .sidebar-container {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+        width: calc(100% - 15rem);
+        position: relative;
+    }
+
+    #show-sidebar-icon {
+        display: block;
+        position: absolute;
+        font-size: 1.4rem;
+        fill: var(--dark-grey);
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .calendar-page #show-sidebar-icon {
+        position: relative;
+    }
+
+    .calendar-page {
+        flex-direction: column;
+    }
+
+    #hide-sidebar-icon {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 0.4rem;
+    }
+
+    #hide-sidebar-icon>svg {
+        cursor: pointer;
+        border: 1px solid var(--grey-v2);
+        border-radius: 4px;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .sidebar-pages {
+        z-index: 1000;
+    }
 }

@@ -116,3 +116,15 @@
     color: red !important;
     margin-bottom: 0;
 }
+
+@media (max-width: 576px) {
+    .register-card {
+        width: 70vw;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 900px) {
+    .register-card {
+        width: 50vw;
+    }
+}

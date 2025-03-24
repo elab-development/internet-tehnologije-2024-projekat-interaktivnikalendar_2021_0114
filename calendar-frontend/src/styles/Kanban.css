@@ -65,6 +65,7 @@
     background-color: var(--grey);
     padding: 0 0.5rem;
     border-radius: 0.5rem;
+    white-space: nowrap;
 }
 
 .add-ticket {
@@ -88,4 +89,20 @@
 
 .add-ticket:hover {
     background-color: var(--grey);
+}
+
+@media (max-width: 576px) {
+    .kanban-page {
+        overflow: hidden;
+        margin: 5rem 2rem;
+    }
+
+    .kanban-container {
+        overflow-x: scroll;
+    }
+
+    .kanban-column {
+        width: 100%;
+        overflow: visible;
+    }
 }

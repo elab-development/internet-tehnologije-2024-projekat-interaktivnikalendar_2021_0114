@@ -141,3 +141,19 @@ button {
 .task-form-container {
   width: 50%;
 }
+
+@media (max-width: 576px) {
+  .task-form {
+    width: 70vw;
+    height: 90vh;
+  }
+
+  .task-form-fields {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .task-form-container {
+    width: 100%;
+  }
+}
