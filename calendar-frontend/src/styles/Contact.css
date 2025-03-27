@@ -6,6 +6,8 @@
   text-align: center;
   padding: 50px 20px;
   height: 70vh;
+
+  position: relative;
 }
 
 h1 {
@@ -22,10 +24,14 @@ h1 {
 
 .contact-card {
   background-color: var(--grey);
-  width: 25vw;
+  width: 25%;
   height: 10vh;
   border-radius: 1rem;
-  box-shadow: 11px 10px 144px -18px rgba(255, 235, 0, 1);
+  /* box-shadow: 11px 10px 144px -18px rgba(255, 235, 0, 1);  */
+  -webkit-box-shadow: 0px -15px 144px -40px rgba(255, 235, 0, 1);
+  -moz-box-shadow: 0px -15px 144px -40px rgba(255, 235, 0, 1);
+  box-shadow: 0px -15px 144px -40px rgba(255, 235, 0, 1);
+
   outline-color: var(--rich-yellow);
   outline-style: solid;
   padding: 2rem;
@@ -37,9 +43,39 @@ h1 {
 
 .contact-card h3 {
   font-size: 20px;
+  font-size: 1.2rem;
   margin-bottom: 10px;
 }
 
 .contact-card p {
-  font-size: 16px;
+  font-size: 1rem;
+}
+
+#waves-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: -1;
+}
+
+@media (max-width: 576px) {
+  .contact-cards-container {
+    flex-direction: column;
+  }
+
+  .contact-card {
+    width: 60vw;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 800px) {
+  .contact-cards-container {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .contact-card {
+    width: 30%;
+  }
 }

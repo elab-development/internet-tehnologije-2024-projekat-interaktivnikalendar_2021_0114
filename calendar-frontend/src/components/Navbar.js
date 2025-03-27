@@ -1,7 +1,10 @@
 import { NavLink } from "react-router-dom";
 import "../styles/Navbar.css";
+import { useState } from "react";
 
 const Navbar = () => {
+  const [openBurgerMenu, setOpenBurgerMenu] = useState(false);
+
   // Add smooth scrolling effect to navigation links and offsets navigation links by 8rem
   const handleScroll = (e, id) => {
     e.preventDefault();
@@ -13,14 +16,24 @@ const Navbar = () => {
         behavior: "smooth",
       });
     }
+    if (openBurgerMenu) setOpenBurgerMenu(false);
   };
 
   return (
     <div className="navbar">
       <div className="navbar-logo">
         <h3>Scrum</h3>
+
+        <div
+          className="navbar-burger-menu"
+          onClick={() => setOpenBurgerMenu(!openBurgerMenu)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-      <nav className="navbar-center">
+      <div className={`navbar-center ${openBurgerMenu ? "show-menu" : ""}`}>
         <a href="#home" onClick={(e) => handleScroll(e, "home")}>
           Home
         </a>
@@ -33,8 +46,8 @@ const Navbar = () => {
         <a href="#contact" onClick={(e) => handleScroll(e, "contact")}>
           Contact
         </a>
-      </nav>
-      <div className="navbar-login">
+      </div>
+      <div className={`navbar-login ${openBurgerMenu ? "show-menu" : ""}`}>
         <NavLink to="/login">Log in</NavLink>
         <NavLink to="/register" id="register">
           Register

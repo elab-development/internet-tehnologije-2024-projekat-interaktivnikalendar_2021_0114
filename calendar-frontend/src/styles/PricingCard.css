@@ -53,7 +53,7 @@
 }
 
 .plan-title {
-    font-size: 1.5vw;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .price {
-    font-size: 2vw;
+    font-size: 1.8rem;
 }
 
 .pricing-features {
@@ -74,7 +74,7 @@
 
 .pricing-features li {
     display: flex;
-    align-items: center;
+    align-items: baseline;
 }
 
 .pricing-features li svg {
@@ -92,4 +92,22 @@
     cursor: pointer;
     width: 100%;
     font-weight: 400;
+}
+
+@media (max-width: 576px) {
+    .pricing-card {
+        height: 40vh;
+        width: 60vw;
+    }
+
+    .pricing-plans {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 776px) {
+    .pricing-card {
+        height: 50vh;
+    }
 }

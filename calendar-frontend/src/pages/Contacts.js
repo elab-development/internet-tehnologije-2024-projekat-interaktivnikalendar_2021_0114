@@ -20,6 +20,12 @@ const Contacts = () => {
           <p>Ljubice Ivosevic 19, Vozdovac, Beograd</p>
         </div>
       </div>
+
+      <img
+        src="/pictures/wave-bottom.svg"
+        alt="waves-bg-bottom"
+        id="waves-bottom"
+      />
     </div>
   );
 };

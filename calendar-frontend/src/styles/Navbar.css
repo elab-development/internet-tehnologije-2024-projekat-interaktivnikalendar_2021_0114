@@ -32,6 +32,7 @@
     color: var(--grey);
     text-decoration: none;
     font-weight: 600;
+    font-size: 1rem;
     padding: 0.8rem;
 }
 
@@ -47,6 +48,69 @@
     background-color: var(--rich-yellow);
     color: var(--black);
     border-radius: 2rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.8rem;
     font-weight: 600;
+    text-align: center;
+}
+
+.navbar-burger-menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.navbar-burger-menu span {
+    height: 0.2rem;
+    width: 2rem;
+    background-color: var(--grey);
+    margin: 0.2rem;
+}
+
+
+@media (max-width: 670px) {
+    .navbar {
+        width: 80%;
+        flex-wrap: wrap;
+    }
+
+    .navbar-burger-menu {
+        display: flex;
+    }
+
+    .navbar-center {
+        display: none;
+    }
+
+    .navbar-login {
+        display: none;
+    }
+
+    .navbar-logo {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .navbar-center.show-menu {
+        display: flex;
+        position: static;
+        transform: none;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar-login.show-menu {
+        display: flex;
+        position: static;
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+    }
+
+    #register {
+        width: 40%;
+        text-align: center;
+        border-radius: 1rem;
+    }
 }
