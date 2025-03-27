@@ -17,13 +17,15 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { fetchActiveTeams } from "./api";
 
-const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
+const Sidebar = ({ children, setSelectedDate, setSprintId, setFilters }) => {
   const [isSprintsCollapsed, setIsSprintsCollapsed] = useState(false);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const navigate = useNavigate();
   const [sprints, setSprints] = useState([]);
   const [selectedSprint, setSelectedSprint] = useState(null);
   const location = useLocation();
+  const [statusFilters, setStatusFilters] = useState([]);
+  const [priorityFilters, setPriorityFilters] = useState([]);
 
   const fetchSprintsData = async () => {
     try {
@@ -73,6 +75,35 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
     setSelectedSprint(sprintId);
     if (setSprintId) setSprintId(sprintId);
   };
+
+  const handleStatusFilterChange = (status) => {
+    const statusValue = status.toLowerCase();
+    setStatusFilters((prevFilters) => {
+      const updatedFilters = prevFilters.includes(statusValue)
+        ? prevFilters.filter((item) => item !== statusValue)
+        : [...prevFilters, statusValue];
+      return updatedFilters;
+    });
+  };
+
+  const handlePriorityFilterChange = (priority) => {
+    setPriorityFilters((prevFilters) => {
+      const updatedFilters = prevFilters.includes(priority)
+        ? prevFilters.filter((item) => item !== priority)
+        : [...prevFilters, priority];
+      return updatedFilters;
+    });
+  };
+
+  // Update filters whenever statusFilters or priorityFilters change
+  useEffect(() => {
+    if (setFilters) {
+      setFilters({
+        statusFilters,
+        priorityFilters,
+      });
+    }
+  }, [statusFilters, priorityFilters, setFilters]);
 
   const showSideBar = () => {
     const sidebar = document.querySelector(".sidebar-container");
@@ -195,23 +226,45 @@ const Sidebar = ({ children, setSelectedDate, setSprintId }) => {
             </div>
           )}
 
-          <div className="sidebar-section">
-            <h3 onClick={toggleFiltersCollapse}>
-              Filters
-              {isFiltersCollapsed ? (
-                <IoIosArrowBack className="arrow-icon" />
-              ) : (
-                <IoIosArrowDown className="arrow-icon" />
+          {setFilters && (
+            <div className="sidebar-section">
+              <h3 onClick={toggleFiltersCollapse}>
+                Filters
+                {isFiltersCollapsed ? (
+                  <IoIosArrowBack className="arrow-icon" />
+                ) : (
+                  <IoIosArrowDown className="arrow-icon" />
+                )}
+              </h3>
+              {!isFiltersCollapsed && (
+                <div>
+                  <h4>Status</h4>
+                  {/* Replace later with fetching distinct statuses and priorities from db */}
+                  {["Backlog", "In Progress", "Done"].map((status) => (
+                    <label key={status} className="filter-item">
+                      <input
+                        type="checkbox"
+                        checked={statusFilters.includes(status.toLowerCase())}
+                        onChange={() => handleStatusFilterChange(status)}
+                      />
+                      {status}
+                    </label>
+                  ))}
+                  <h4>Priority</h4>
+                  {["Low", "Medium", "High"].map((priority) => (
+                    <label key={priority} className="filter-item">
+                      <input
+                        type="checkbox"
+                        checked={priorityFilters.includes(priority)}
+                        onChange={() => handlePriorityFilterChange(priority)}
+                      />
+                      {priority}
+                    </label>
+                  ))}
+                </div>
               )}
-            </h3>
-            {!isFiltersCollapsed && (
-              <ul>
-                <li>Filter 1</li>
-                <li>Filter 2</li>
-                <li>Filter 3</li>
-              </ul>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="sidebar-settings">

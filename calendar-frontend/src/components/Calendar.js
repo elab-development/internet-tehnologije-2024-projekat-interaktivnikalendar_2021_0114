@@ -17,7 +17,6 @@ import {
 } from "./utils";
 import {
   fetchSprints,
-  fetchTasks,
   fetchLoggedInUser,
   deleteSprint,
   deleteTask,
@@ -25,7 +24,7 @@ import {
 import { downloadTasksIcsFile, downloadSprintsIcsFile } from "./icsUtils";
 import { useFetchData, useHandleClickOutside } from "../hooks/calendarHooks";
 
-const Calendar = ({ selectedDate }) => {
+const Calendar = ({ selectedDate, filters }) => {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -215,14 +214,35 @@ const Calendar = ({ selectedDate }) => {
       .filter((event) => event !== null);
   };
 
-  // Memoize the events array to prevent unnecessary recalculations on every render
+  const filterTasks = (tasks, filters) => {
+    console.log("tasks");
+    const normalizedStatusFilters = filters.statusFilters.map((status) =>
+      status.toLowerCase()
+    );
+    const normalizedPriorityFilters = filters.priorityFilters.map((priority) =>
+      priority.toLowerCase()
+    );
+
+    return tasks.filter((task) => {
+      const matchesStatus =
+        normalizedStatusFilters.length === 0 ||
+        normalizedStatusFilters.includes(task.status?.toLowerCase());
+      const matchesPriority =
+        normalizedPriorityFilters.length === 0 ||
+        normalizedPriorityFilters.includes(task.priority?.toLowerCase());
+      return matchesStatus && matchesPriority;
+    });
+  };
+
+  // Memoize the events array
   const events = useMemo(() => {
+    const filteredTasks = filterTasks(tasks, filters);
     return [
       ...prepareSprintEvents(sprints),
-      ...prepareTaskEvents(tasks),
+      ...prepareTaskEvents(filteredTasks),
       ...holidays,
     ];
-  }, [sprints, tasks, holidays]);
+  }, [tasks, sprints, holidays, filters]);
 
   const handleEventClick = (info) => {
     if (info.event.extendedProps.type === "sprint") {

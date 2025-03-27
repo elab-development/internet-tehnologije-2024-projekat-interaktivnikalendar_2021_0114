@@ -20,7 +20,7 @@ Route::get('/user-with-role', [UserController::class, 'getUserWithRole'])->middl
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
-  
+
 Route::get('/invitations/accept/{token}', [InvitationController::class, 'acceptInvitation']);
 
 // Protected routes
@@ -67,9 +67,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/assign/{sprint_id}/{user_id}', [SprintController::class, 'assignUserToSprint'])->name('sprint.assignUser');
         Route::delete('/assign/{sprint_id}/{user_id}', [SprintController::class, 'removeUserFromSprint'])->name('sprint.removeUser');
     });
-   
+
     Route::post('/invitations', [InvitationController::class, 'sendInvitation']);
- 
+
 
     // Logout route
     Route::post('logout', [AuthController::class, 'logout']);
