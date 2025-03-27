@@ -12,7 +12,7 @@ const Features = () => {
       <h1 id="features">Features</h1>
       <div className="feature">
         <div className="feature-img-container">
-          <img src="/pictures/fallback-picture.png" alt="Calendar View" />
+          <img src="/pictures/calendar-view.png" alt="Calendar View" />
         </div>
         <div className="feature-text">
           <h2>Interactive Calendar</h2>
@@ -26,7 +26,7 @@ const Features = () => {
 
       <div className="feature left-side">
         <div className="feature-img-container">
-          <img src="/pictures/fallback-picture.png" alt="Kanban Board" />
+          <img src="/pictures/kanban-view.png" alt="Kanban Board" />
         </div>
         <div className="feature-text">
           <h2>Kanban Board</h2>
@@ -42,7 +42,7 @@ const Features = () => {
 
       <div className="feature">
         <div className="feature-img-container">
-          <img src="/pictures/fallback-picture.png" alt="Team Management" />
+          <img src="/pictures/teams-view.png" alt="Team Management" />
         </div>
         <div className="feature-text">
           <h2>Team Management</h2>
